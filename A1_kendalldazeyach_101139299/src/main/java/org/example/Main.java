@@ -22,8 +22,8 @@ public class Main {
     }
 
     public void nextTurn (){
-        display.displayTurn(getPlayer(0));
-        display.displayHand(getPlayer(0));
+        display.displayTurn(currentPlayer);
+        display.displayHand(currentPlayer);
     }
 
     public void distributeHands(){

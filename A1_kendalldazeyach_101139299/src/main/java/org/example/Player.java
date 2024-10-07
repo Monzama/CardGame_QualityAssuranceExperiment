@@ -2,11 +2,14 @@ package org.example;
 
 import javax.smartcardio.Card;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Player {
     int handSize;
     String name;
     ArrayList<AdventureCard> hand;
+
     public Player(String n) {
         handSize = 0;
         name = n;
@@ -17,7 +20,8 @@ public class Player {
         hand.add(c);
         handSize++;
     }
-    public int getHandSize(){
+
+    public int getHandSize() {
         return handSize;
     }
 
@@ -25,8 +29,13 @@ public class Player {
         return name;
     }
 
-    //foes in increasing order then weapons in increasing order, swords before horses.
-    public void sortHand(){
+    public ArrayList<AdventureCard> getHand() {
+        return hand;
+    }
 
+    // Foes in increasing order, then weapons in increasing order, swords before horses.
+    public void sortHand() {
+        Collections.sort(hand);
     }
 }
+
