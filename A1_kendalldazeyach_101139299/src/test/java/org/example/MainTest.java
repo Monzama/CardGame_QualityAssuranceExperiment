@@ -1,8 +1,9 @@
 package org.example;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -131,5 +132,36 @@ class MainTest {
         Game.distributeHands();
         int deckSize = Game.main_deck.getA_deck_size();
         assertEquals(52, deckSize, "Deck size should be 52");
+    }
+
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+    @Test
+    @DisplayName("The Game indicates whose turn it is and displays their hand")
+    void RESP_03_test_01() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        Player p = new Player("p1");
+        p.addCardToHand(new AdventureCard("F5","F",5));
+        p.addCardToHand(new AdventureCard("F15","F",15));
+        p.addCardToHand(new AdventureCard("F25","F",25));
+        p.addCardToHand(new AdventureCard("F50","F",50));
+        p.addCardToHand(new AdventureCard("F5","F",5));
+        p.addCardToHand(new AdventureCard("D5","D",5));
+        p.addCardToHand(new AdventureCard("E30","E",30));
+        p.addCardToHand(new AdventureCard("B15","B",15));
+        p.addCardToHand(new AdventureCard("S10","S",10));
+        p.addCardToHand(new AdventureCard("H10","H",10));
+        p.addCardToHand(new AdventureCard("S10","S",10));
+        p.addCardToHand(new AdventureCard("H10","H",10));
+        p.sortHand();
+        Game.currentPlayer = p;
+        Game.nextTurn();
+        assertEquals("Current Player: p1\nHand:\nF5\nF5\nF15\nF25\nF50\nD5\nS10\nS10\nH10\nH10\nB15\nE30", outputStreamCaptor.toString().trim().replace("\r",""));
+    }
+    @AfterEach
+    void normalPrint(){
+        System.setOut(standardOut);
     }
 }

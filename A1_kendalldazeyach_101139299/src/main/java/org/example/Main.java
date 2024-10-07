@@ -9,20 +9,28 @@ public class Main {
     //setup game variables
     Deck main_deck= new Deck();
     ArrayList<Player> players = new ArrayList<Player>(0);
+    Player currentPlayer;
+    Display display;
     public Main(){
         this.GenerateEventDeck();
         this.GenerateAdventureDeck();
         main_deck.shuffle();
+        display = new Display();
     }
     public static void main(String[] args) {
         Main main = new Main();
     }
 
+    public void nextTurn (){
+        display.displayTurn(getPlayer(0));
+        display.displayHand(getPlayer(0));
+    }
+
     public void distributeHands(){
-        Player p1 = new Player();
-        Player p2 = new Player();
-        Player p3 = new Player();
-        Player p4 = new Player();
+        Player p1 = new Player("p1");
+        Player p2 = new Player("p2");
+        Player p3 = new Player("p3");
+        Player p4 = new Player("p4");
         for (int i = 1; i <=12 ; i++) {
             for (int j = 0; j <4 ; j++) {
                 switch (j){
@@ -46,8 +54,8 @@ public class Main {
         players.add(p2);
         players.add(p3);
         players.add(p4);
+        currentPlayer = players.getFirst();
     }
-
     public Player getPlayer(int x){
         return players.get(x);
     }
@@ -83,7 +91,6 @@ public class Main {
             }
         }
     }
-
     public void GenerateAdventureDeck(){
         for (int i = 1; i <= 100; i++) {
             if (i<= 8){
@@ -152,7 +159,6 @@ public class Main {
             }
         }
     }
-
     public int GetEventDeckSize(){
         return main_deck.getE_deck_size();
     }
