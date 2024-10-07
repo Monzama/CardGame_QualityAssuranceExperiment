@@ -116,6 +116,7 @@ class MainTest {
     @DisplayName("Distribute 12 cards to each player")
     void RESP_02_test_01() {
         Main Game = new Main();
+        Game.distributeHands();
         Boolean lessThanTwelve = false;
         for (int i = 0; i < 4; i++) {
             Player p = Game.getPlayer(i);
@@ -127,6 +128,7 @@ class MainTest {
     @DisplayName("Deck is updated, should now have 52 cards")
     void RESP_02_test_02() {
         Main Game = new Main();
+        Game.distributeHands();
         int deckSize = Game.main_deck.getA_deck_size();
         assertEquals(52, deckSize, "Deck size should be 52");
     }

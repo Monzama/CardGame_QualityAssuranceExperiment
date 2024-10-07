@@ -8,25 +8,49 @@ import java.util.ArrayList;
 public class Main {
     //setup game variables
     Deck main_deck= new Deck();
-    ArrayList<Player> players = new ArrayList<Player>(4);
+    ArrayList<Player> players = new ArrayList<Player>(0);
     public Main(){
         this.GenerateEventDeck();
         this.GenerateAdventureDeck();
         main_deck.shuffle();
-        distributeHands();
     }
     public static void main(String[] args) {
         Main main = new Main();
     }
 
-    private void distributeHands(){
+    public void distributeHands(){
+        Player p1 = new Player();
+        Player p2 = new Player();
+        Player p3 = new Player();
+        Player p4 = new Player();
+        for (int i = 1; i <=12 ; i++) {
+            for (int j = 0; j <4 ; j++) {
+                switch (j){
+                    case 0:
+                        p1.addCardToHand(this.DrawAdventureCard());
+                        break;
+                        case 1:
+                            p2.addCardToHand(this.DrawAdventureCard());
+                            break;
+                            case 2:
+                                p3.addCardToHand(this.DrawAdventureCard());
+                                break;
+                                case 3:
+                                    p4.addCardToHand(this.DrawAdventureCard());
+                                    break;
 
+                }
+            }
+        }
+        players.add(p1);
+        players.add(p2);
+        players.add(p3);
+        players.add(p4);
     }
 
     public Player getPlayer(int x){
-        return new Player();
+        return players.get(x);
     }
-
     private void GenerateEventDeck(){
         for (int i = 0; i <= 16; i++) {
             if (i<= 2){
