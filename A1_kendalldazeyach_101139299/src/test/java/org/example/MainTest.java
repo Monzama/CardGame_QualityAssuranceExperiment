@@ -31,12 +31,13 @@ class MainTest {
     @DisplayName("check foe cards = 50 and weapon cards = 50, match in count and correct amount of specified values")
     void RESP_01_test_03() {
         Main Game = new Main();
-        AdventureCard c = Game.DrawAdventureCard();
+        AdventureCard c;
 
         Dictionary<String, Integer> a_cards = new Hashtable<>();
 
         int foe_count = 0, weapon_count = 0;
         for (int i = 0; i < 100; i++) {
+            c = Game.DrawAdventureCard();
             if (a_cards.get((c.GetCardType()+c.GetCardValue()))!= null) {
                 int count = a_cards.get((c.GetCardType() + c.GetCardValue()));
                 count++;
@@ -46,10 +47,9 @@ class MainTest {
             }
             if (Objects.equals(c.GetCardType(), "F")){
                 foe_count++;
-            } else{
+            } else {
                 weapon_count++;
             }
-            c = Game.DrawAdventureCard();
         }
         assertEquals(50, foe_count, "Foe cards should be 50");
         assertEquals(50, weapon_count, "Weapon cards should be 50");
@@ -78,11 +78,12 @@ class MainTest {
     @DisplayName("check Q cards = 12 and E cards = 5,  match in count and correct amount of specified values")
     void RESP_01_test_04() {
         Main Game = new Main();
-        EventCard c = Game.DrawEventCard();
+        EventCard c;
         Dictionary<String, Integer> e_cards = new Hashtable<>();
 
         int Q_count = 0, E_count = 0;
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 17; i++) {
+            c = Game.DrawEventCard();
             if (e_cards.get(c.GetCardName())!= null) {
                 int count = e_cards.get(c.GetCardName());
                 count++;
@@ -95,7 +96,6 @@ class MainTest {
             } else{
                 E_count++;
             }
-            c = Game.DrawEventCard();
         }
         assertEquals(12, Q_count, "Q cards should be 12");
         assertEquals(5, E_count, "E cards should be 5");
@@ -113,6 +113,3 @@ class MainTest {
     }
 
 }
-
-
-
