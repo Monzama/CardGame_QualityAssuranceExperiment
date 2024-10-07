@@ -1,20 +1,30 @@
 package org.example;
 
 import javax.annotation.processing.Generated;
+import java.util.ArrayList;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     //setup game variables
     Deck main_deck= new Deck();
-
+    ArrayList<Player> players = new ArrayList<Player>(4);
     public Main(){
         this.GenerateEventDeck();
         this.GenerateAdventureDeck();
         main_deck.shuffle();
+        distributeHands();
     }
     public static void main(String[] args) {
         Main main = new Main();
+    }
+
+    private void distributeHands(){
+
+    }
+
+    public Player getPlayer(int x){
+        return new Player();
     }
 
     private void GenerateEventDeck(){

@@ -112,4 +112,22 @@ class MainTest {
         //by the time we get here, we know the deck is perfect
     }
 
+    @Test
+    @DisplayName("Distribute 12 cards to each player")
+    void RESP_02_test_01() {
+        Main Game = new Main();
+        Boolean lessThanTwelve = false;
+        for (int i = 0; i < 4; i++) {
+            Player p = Game.getPlayer(i);
+            if (p.getHandSize()<12){lessThanTwelve = true;}
+        }
+        assertEquals(false, lessThanTwelve, "At least one player does not have 12 cards");
+    }
+    @Test
+    @DisplayName("Deck is updated, should now have 52 cards")
+    void RESP_02_test_02() {
+        Main Game = new Main();
+        int deckSize = Game.main_deck.getA_deck_size();
+        assertEquals(52, deckSize, "Deck size should be 52");
+    }
 }

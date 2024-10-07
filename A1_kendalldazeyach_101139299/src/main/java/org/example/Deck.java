@@ -37,9 +37,17 @@ public class Deck {
     }
 
     public AdventureCard DrawAdventureCard(){
-        return adventure_cards.removeFirst();
+        if (adventure_cards.size() > 0) {
+            return adventure_cards.remove(0);
+        }else {
+            return null;
+        }
     }
     public EventCard DrawEventCard(){
-        return event_cards.removeFirst();
+        if (event_cards.size() > 0) {
+            return event_cards.remove(0);
+        }else {
+            return null;
+        }
     }
 }
