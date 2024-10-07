@@ -1,24 +1,45 @@
 package org.example;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Deck {
-
+    int a_deck_size;
+    int e_deck_size;
+    ArrayList<AdventureCard> adventure_cards;
+    ArrayList<EventCard> event_cards;
     public Deck() {
-
+        a_deck_size = 0;
+        e_deck_size = 0;
+        adventure_cards = new ArrayList<>(0);
+        event_cards = new ArrayList<>(0);
     }
 
-    public Deck(int size, String deckName) {
-
+    public int getE_deck_size() {
+        return e_deck_size;
+    }
+    public int getA_deck_size() {
+        return a_deck_size;
     }
 
-    public int getDeckSize() {
-        return 0;
+    public void addCard(EventCard c) {
+        event_cards.add(c);
+        e_deck_size++;
+    }
+    public void addCard(AdventureCard c) {
+        adventure_cards.add(c);
+        a_deck_size++;
+    }
+
+    public void shuffle() {
+        Collections.shuffle(adventure_cards);
+        Collections.shuffle(event_cards);
     }
 
     public AdventureCard DrawAdventureCard(){
-        return new AdventureCard();
+        return adventure_cards.removeFirst();
     }
     public EventCard DrawEventCard(){
-        return new EventCard();
+        return event_cards.removeFirst();
     }
 }

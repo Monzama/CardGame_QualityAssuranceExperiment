@@ -1,11 +1,23 @@
 package org.example;
 
-public class AdventureCard {
+import java.io.Serializable;
 
+public class AdventureCard {
+    String type;
+    String name;
+    int value;
+    public AdventureCard(String n, String t, int v) {
+        name = n;
+        type = t;
+        value = v;
+    }
     public String GetCardType(){
-        return "";
+        return type;
     }
     public int GetCardValue(){
-        return 0;
+        return value;
+    }
+    public String GetCardName(){
+        return name;
     }
 }
