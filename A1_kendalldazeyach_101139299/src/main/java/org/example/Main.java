@@ -26,6 +26,10 @@ public class Main {
         display.displayHand(currentPlayer);
     }
 
+    public void endTurn(){
+        //find winner
+    }
+
     public void distributeHands(){
         Player p1 = new Player("p1");
         Player p2 = new Player("p2");

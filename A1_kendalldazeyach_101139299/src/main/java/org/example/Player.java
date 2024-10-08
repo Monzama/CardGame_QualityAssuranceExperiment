@@ -9,11 +9,17 @@ public class Player {
     int handSize;
     String name;
     ArrayList<AdventureCard> hand;
+    int shields;
 
     public Player(String n) {
         handSize = 0;
         name = n;
         hand = new ArrayList<>(0);
+        shields = 0;
+    }
+
+    public int getShields(){
+        return 0;
     }
 
     public void addCardToHand(AdventureCard c) {

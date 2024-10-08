@@ -160,6 +160,39 @@ class MainTest {
         Game.nextTurn();
         assertEquals("Current Player: p1\nHand:\nF5\nF5\nF15\nF25\nF50\nD5\nS10\nS10\nH10\nH10\nB15\nE30", outputStreamCaptor.toString().trim().replace("\r",""));
     }
+
+
+    @Test
+    @DisplayName("At the end of a turn, game checks and displays winner, if there is one")
+    void RESP_04_test_01() {
+        outputStreamCaptor.reset();
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        //manufacture win condition here
+        //multiple winners
+        Player p1 = new Player("p1");
+        Player p2 = new Player("p2");
+        Player p3 = new Player("p3");
+        Player p4 = new Player("p4");
+        p1.shields = 7;
+        p2.shields = 7;
+        p3.shields = 6;
+        p4.shields = 0;
+        Game.endTurn();//check to see if game over
+        assertEquals("End Of Turn:\nGame Over!\np1 & P2 Win The Game!", outputStreamCaptor.toString().trim().replace("\r",""));
+        outputStreamCaptor.reset();
+        //one winner
+        Game = new Main();
+        Game.distributeHands();
+        p1.shields = 0;
+        p2.shields = 0;
+        p3.shields = 0;
+        p4.shields = 7;
+        Game.endTurn();
+        assertEquals("End Of Turn:\nGame Over!\np4 Wins The Game!", outputStreamCaptor.toString().trim().replace("\r",""));
+    }
+
     @AfterEach
     void normalPrint(){
         System.setOut(standardOut);
