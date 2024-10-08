@@ -112,11 +112,14 @@ public class Main {
             //do the quest setup
             for (int i = 0; i < questValue; i++) {
                 //do something
-                setupStage(i);
+                setupStage(i, sponsor);
             }
         }
     }
-    public void setupStage(int round){
+    public void setupStage(int round, Player sponsor){
+        System.out.println("Setup Stage " + round);
+        display.displayHand(sponsor);
+        String response = display.getMessage(sponsor.name + " Select a card to add to the stage or 'Quit' if done:");
 
     }
 

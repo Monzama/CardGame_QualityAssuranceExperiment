@@ -15,7 +15,9 @@ public class Display {
     public String getMessage(String message){
         String m = "";
         System.out.print(message+":");
-        m = sc.nextLine();
+        if (sc.hasNextLine()){
+            m = sc.nextLine();
+        }
         return m;
     }
 
