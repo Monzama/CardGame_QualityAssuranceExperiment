@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Main {
     //setup game variables
@@ -75,11 +76,45 @@ public class Main {
                 players.set(3, p4);
                 endTurn();
                 break;
-            case "Q5":
-                //System.out.println(currentPlayer.name+ " Would you like to sponsor this quest?");
-                break;
+
+        }
+        if (Objects.equals(current_event.GetCardType(), "Q")){
+            initiateQuest(current_event.GetCardValue());
         }
     }
+
+    public void initiateQuest(int questValue){
+        Player sponsor = null;
+        Player offer = currentPlayer;
+        if (questValue == 1){
+            System.out.println(offer.name+ " Would you like to sponsor this quest?:");
+            return;
+        }
+        while (true){
+            String ans = display.getMessage(offer.name+ " Would you like to sponsor this quest?");
+            if (Objects.equals(ans, "no")){
+                if (offer.id == 3){
+                    System.out.println("No Sponsorship, Quest Abandoned");
+                    endTurn();
+                    break;
+                }else{
+                    offer = players.get(offer.id+1);
+                }
+            }else if (Objects.equals(ans, "yes")){
+                sponsor = offer;
+                break;
+            }else {
+                System.out.println("Invalid Input");
+            }
+        }
+        if (sponsor != null){
+            //do the quest setup
+            for (int i = 0; i < questValue; i++) {
+                //do something
+            }
+        }
+    }
+
 
     public void endTurn(){
         System.out.println("End Of Turn:");

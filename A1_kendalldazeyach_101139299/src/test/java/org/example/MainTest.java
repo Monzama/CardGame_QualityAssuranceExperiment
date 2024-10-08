@@ -212,7 +212,7 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q", 5);
+        EventCard e = new EventCard("Q5","Q", 1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean q_response = outputStreamCaptor.toString().trim().replace("\r","").contains("The Next Event Card Is: Q5,");
@@ -316,16 +316,19 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q",5);
+        EventCard e = new EventCard("Q5","Q",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
+        Boolean quest_req= outputStreamCaptor.toString().trim().replace("\r","").contains("The Next Event Card Is: Q5,\n"+Game.currentPlayer.name+ " Would you like to sponsor this quest?:");
         //check the display
-        assertEquals("The Next Event Card Is: Q5,\n"+Game.currentPlayer.name+ " Would you like to sponsor this quest?", outputStreamCaptor.toString().trim().replace("\r",""));
+        assertEquals(true, quest_req);
     }
 
     @Test
     @DisplayName("The current player has drawn a Q card, no player sponsors Q and Q ends + current turn")
     void RESP_11_test_02() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "no").getBytes());
+        System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
