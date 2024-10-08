@@ -86,7 +86,7 @@ public class Main {
     public void initiateQuest(int questValue){
         Player sponsor = null;
         Player offer = currentPlayer;
-        if (questValue == 1){
+        if (questValue == 10){
             System.out.println(offer.name+ " Would you like to sponsor this quest?:");
             return;
         }
@@ -109,6 +109,8 @@ public class Main {
         }
         if (sponsor != null){
             System.out.println(sponsor.name+ " Sponsors The Quest!");
+            System.out.println("Setup Stage 1");
+            display.displayHand(sponsor);
             //do the quest setup
             for (int i = 0; i < questValue; i++) {
                 //do something
@@ -118,9 +120,50 @@ public class Main {
     }
     public void setupStage(int round, Player sponsor){
         ArrayList<AdventureCard> stage = new ArrayList<>(0);
-        System.out.println("Setup Stage " + round);
-        display.displayHand(sponsor);
-        String response = display.getMessage(sponsor.name + " Select a card to add to the stage or 'Quit' if done:");
+        boolean r_add = true;
+        while (r_add == true){
+            String response = display.getMessage(sponsor.name + " Select a card to add to the stage or 'Quit' if done:");
+            if (Objects.equals(response, "Quit")){
+                if (stage.isEmpty()){
+                    //stage empty error
+                    System.out.println("A stage cannot be empty");
+                }else{
+                    //stage ready to play
+                    r_add = false;
+                    System.out.println("Stage set");
+                }
+            }else{
+                int index = -1;
+                try {
+                    index = Integer.parseInt(response);
+                }catch (NumberFormatException e){
+                    System.out.println("Invalid Input, must be an integer");
+                    break;
+                }
+                if (index < 0 || index >= sponsor.handSize){
+                    System.out.println("Invalid Input, must be within size of hand");
+                }else{
+                    AdventureCard card = sponsor.hand.get(index-1);
+                    if (stage.contains(card) && !Objects.equals(card.GetCardType(), "F")){
+                        System.out.println("Invalid Input, cannot be duplicate weapon");
+                    }else if (Objects.equals(card.GetCardType(), "F")){
+                        if (stage.contains(card)){
+                            System.out.println("Invalid Card, a stage cannot have more than one foe");
+                        }else{
+                            System.out.println("Card Valid");
+                            stage.add(card);
+                        }
+
+                    }else if (stage.isEmpty()){
+                        System.out.println("Invalid Card, a stage cannot have a weapon and no foe");
+                    }else{
+                        System.out.println("Card Valid");
+                        stage.add(card);
+                    }
+                }
+
+            }
+        }
 
     }
 

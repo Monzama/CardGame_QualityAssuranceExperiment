@@ -212,7 +212,7 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q", 1);
+        EventCard e = new EventCard("Q5","Q", 10);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean q_response = outputStreamCaptor.toString().trim().replace("\r","").contains("The Next Event Card Is: Q5,");
@@ -316,7 +316,7 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q",1);
+        EventCard e = new EventCard("Q5","Q",10);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean quest_req= outputStreamCaptor.toString().trim().replace("\r","").contains("The Next Event Card Is: Q5,\n"+Game.currentPlayer.name+ " Would you like to sponsor this quest?:");
@@ -348,7 +348,7 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q",5);
+        EventCard e = new EventCard("Q5","Q",-1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Hand:");
@@ -360,12 +360,18 @@ class MainTest {
     @Test
     @DisplayName("The sponsor has been prompted for the position of the next card or 'Quit'")
     void RESP_12_test_02() {
-        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes").getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" + System.lineSeparator()+ "1" + System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q",5);
+        Player sponsor = Game.getPlayer(3);
+        AdventureCard a1 = new AdventureCard("F5","F",5);
+        AdventureCard a2 = new AdventureCard("D5","D",5);
+        sponsor.hand.set(0,a1);
+        sponsor.hand.set(1,a2);
+        Game.players.set(3,sponsor);
+        EventCard e = new EventCard("Q5","Q",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Select a card to add to the stage or 'Quit' if done");
@@ -376,12 +382,18 @@ class MainTest {
     @Test
     @DisplayName("The sponsor has entered 'wads' and gets error message")
     void RESP_13_test_01() {
-        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "wads").getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "wads" +System.lineSeparator() +  "1"+System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q",5);
+        Player sponsor = Game.getPlayer(3);
+        AdventureCard a1 = new AdventureCard("F5","F",5);
+        AdventureCard a2 = new AdventureCard("D5","D",5);
+        sponsor.hand.set(0,a1);
+        sponsor.hand.set(1,a2);
+        Game.players.set(3,sponsor);
+        EventCard e = new EventCard("Q5","Q",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Invalid Input, must be an integer");
@@ -392,12 +404,18 @@ class MainTest {
     @Test
     @DisplayName("The sponsor has entered integer out of range and gets error message")
     void RESP_13_test_02() {
-        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "13").getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "13" + System.lineSeparator() + "1"+System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q",5);
+        Player sponsor = Game.getPlayer(3);
+        AdventureCard a1 = new AdventureCard("F5","F",5);
+        AdventureCard a2 = new AdventureCard("D5","D",5);
+        sponsor.hand.set(0,a1);
+        sponsor.hand.set(1,a2);
+        Game.players.set(3,sponsor);
+        EventCard e = new EventCard("Q5","Q",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Invalid Input, must be within size of hand");
@@ -408,16 +426,19 @@ class MainTest {
     @Test
     @DisplayName("The sponsor has entered integer in range and card is invalid (repeated)")
     void RESP_13_test_03() {
-        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "1" +System.lineSeparator() + "2").getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "1" +System.lineSeparator() + "2" +System.lineSeparator() + "3" +System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
         Player sponsor = Game.getPlayer(3);
-        AdventureCard a1 = new AdventureCard("D5","D",5);
+        AdventureCard a1 = new AdventureCard("F5","F",5);
+        AdventureCard a2 = new AdventureCard("D5","D",5);
         sponsor.hand.set(0,a1);
-        sponsor.hand.set(1,a1);
-        EventCard e = new EventCard("Q5","Q",5);
+        sponsor.hand.set(1,a2);
+        sponsor.hand.set(2,a2);
+        Game.players.set(3,sponsor);
+        EventCard e = new EventCard("Q5","Q",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Invalid Input, cannot be duplicate weapon");
@@ -433,7 +454,11 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q",5);
+        Player sponsor = Game.getPlayer(3);
+        AdventureCard a1 = new AdventureCard("F5","F",5);
+        sponsor.hand.set(0,a1);
+        Game.players.set(3,sponsor);
+        EventCard e = new EventCard("Q5","Q",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Card Valid");
