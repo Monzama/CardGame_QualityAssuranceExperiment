@@ -45,6 +45,10 @@ public class Player {
         if (shields < 0){shields = 0;}
     }
 
+    private boolean trimHand(){
+        return hand.size() > 0;
+    }
+
 
     // Foes in increasing order, then weapons in increasing order, swords before horses.
     public void sortHand() {

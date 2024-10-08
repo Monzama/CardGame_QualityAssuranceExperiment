@@ -253,11 +253,6 @@ class MainTest {
         //check the display
         assertEquals("The Next Event Card Is: Plague,\np1 loses 2 shields!\nEnd Of Turn:", outputStreamCaptor.toString().trim().replace("\r",""));
     }
-    //just to reset sysout
-    @AfterEach
-    void normalPrint(){
-        System.setOut(standardOut);
-    }
 
     @Test
     @DisplayName("player gains or loses shields")
@@ -269,5 +264,28 @@ class MainTest {
         assertEquals(0, Game.currentPlayer.shields);
         Game.currentPlayer.adjustShields(10);
         assertEquals(10, Game.currentPlayer.shields);
+    }
+
+    @Test
+    @DisplayName("if a player has >12 cards, they are directed to trim hand sequence")
+    void RESP_08_test_01() {
+        Main Game = new Main();
+        Game.distributeHands();
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Game.currentPlayer.addCardToHand(Game.main_deck.DrawAdventureCard());
+        String out = outputStreamCaptor.toString().trim();
+        Boolean redirected = (out.contains(Game.currentPlayer.name + " please trim your hand:"));
+        assertEquals(true, redirected);
+    }
+
+
+
+
+
+
+    //just to reset sysout
+    @AfterEach
+    void normalPrint(){
+        System.setOut(standardOut);
     }
 }
