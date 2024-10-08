@@ -207,7 +207,7 @@ class MainTest {
     }
 
     @Test
-    @DisplayName("The Game indicates whose turn it is and displays their hand")
+    @DisplayName("The game draws and displays the next event card")
     void RESP_05_test_01() {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
@@ -216,6 +216,43 @@ class MainTest {
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         assertEquals("The Next Event Card Is: Q5", outputStreamCaptor.toString().trim().replace("\r",""));
+    }
+
+    @Test
+    @DisplayName("The current player has drawn an E card, E- action is triggered")
+    void RESP_06_test_01() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Plague","E",0);
+        Game.currentPlayer.shields = 3;
+        int cur_shields = Game.currentPlayer.shields;
+        int cur_hand = Game.currentPlayer.handSize;
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean updated_hand_or_shields = false;
+        if (cur_shields != Game.currentPlayer.shields) {
+            updated_hand_or_shields = true;
+        }
+        if (cur_hand != Game.currentPlayer.handSize) {
+            updated_hand_or_shields = true;
+        }
+        assertEquals(true,updated_hand_or_shields, "current player hand size or shields have updated based on E card");
+        //check the minimum shields
+    }
+
+    @Test
+    @DisplayName("The current player has drawn an E card, E- action and card are displayed")
+    void RESP_06_test_02() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Plague","E",0);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Game.endTurn();
+        //check the display
+        assertEquals("The Next Event Card Is: Plague,\np1 loses 2 shields!\nEnd Of Turn:\nNo winners, game continues!", outputStreamCaptor.toString().trim().replace("\r",""));
     }
 
     @AfterEach

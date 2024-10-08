@@ -3,8 +3,6 @@ package org.example;
 import javax.annotation.processing.Generated;
 import java.util.ArrayList;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     //setup game variables
     Deck main_deck= new Deck();
