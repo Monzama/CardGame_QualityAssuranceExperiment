@@ -2,8 +2,6 @@ package org.example;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Scanner;
 
 public class Player {
     int handSize;
@@ -72,7 +70,6 @@ public class Player {
             handSize--;
         }
         return handSize == 12;
-        
     }
 
     // Foes in increasing order, then weapons in increasing order, swords before horses.

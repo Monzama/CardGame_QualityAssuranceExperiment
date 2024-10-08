@@ -1,9 +1,5 @@
 package org.example;
 
-import javax.xml.namespace.QName;
-import java.io.Serializable;
-import java.lang.reflect.Type;
-
 public class EventCard {
     String type;
     String name;

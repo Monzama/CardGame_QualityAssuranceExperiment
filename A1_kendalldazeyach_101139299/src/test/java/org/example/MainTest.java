@@ -215,7 +215,8 @@ class MainTest {
         EventCard e = new EventCard("Q5","Q", 5);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
-        assertEquals("The Next Event Card Is: Q5,", outputStreamCaptor.toString().trim().replace("\r",""));
+        Boolean q_response = outputStreamCaptor.toString().trim().replace("\r","").contains("The Next Event Card Is: Q5,");
+        assertTrue(q_response);
     }
 
     @Test
@@ -309,7 +310,32 @@ class MainTest {
         assertEquals(12, Game.currentPlayer.handSize);
     }
 
+    @Test
+    @DisplayName("The current player has drawn a Q card, prompts current player for sponsorship")
+    void RESP_11_test_01() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Q5","Q",5);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        //check the display
+        assertEquals("The Next Event Card Is: Q5,\n"+Game.currentPlayer.name+ " Would you like to sponsor this quest?", outputStreamCaptor.toString().trim().replace("\r",""));
+    }
 
+    @Test
+    @DisplayName("The current player has drawn a Q card, no player sponsors Q and Q ends + current turn")
+    void RESP_11_test_02() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Q5","Q",5);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean quest_fail= outputStreamCaptor.toString().trim().replace("\r","").contains("No Sponsorship, Quest Abandoned");
+        //check the display
+        assertEquals(true, quest_fail);
+    }
 
     //just to reset sysout
     @AfterEach

@@ -1,6 +1,5 @@
 package org.example;
 
-import javax.annotation.processing.Generated;
 import java.util.ArrayList;
 
 public class Main {
@@ -76,7 +75,9 @@ public class Main {
                 players.set(3, p4);
                 endTurn();
                 break;
-
+            case "Q5":
+                //System.out.println(currentPlayer.name+ " Would you like to sponsor this quest?");
+                break;
         }
     }
 

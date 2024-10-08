@@ -1,7 +1,5 @@
 package org.example;
 
-import java.io.Serializable;
-
 public class AdventureCard implements Comparable<AdventureCard> {
     String type;
     String name;
