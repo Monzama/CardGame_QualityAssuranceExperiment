@@ -142,7 +142,7 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        Player p = new Player("p1");
+        Player p = new Player("p1",0);
         p.addCardToHand(new AdventureCard("F5","F",5));
         p.addCardToHand(new AdventureCard("F15","F",15));
         p.addCardToHand(new AdventureCard("F25","F",25));
@@ -171,16 +171,22 @@ class MainTest {
         Game.distributeHands();
         //manufacture win condition here
         //multiple winners
-        Player p1 = new Player("p1");
-        Player p2 = new Player("p2");
-        Player p3 = new Player("p3");
-        Player p4 = new Player("p4");
+        Player p1 = new Player("p1",0);
+        Player p2 = new Player("p2",1);
+        Player p3 = new Player("p3",2);
+        Player p4 = new Player("p4",3);
         p1.shields = 7;
         p2.shields = 7;
         p3.shields = 6;
         p4.shields = 0;
+        ArrayList<Player> ps = new ArrayList<>(0);
+        ps.add(p1);
+        ps.add(p2);
+        ps.add(p3);
+        ps.add(p4);
+        Game.players = ps;
         Game.endTurn();//check to see if game over
-        assertEquals("End Of Turn:\nGame Over!\np1 & P2 Win The Game!", outputStreamCaptor.toString().trim().replace("\r",""));
+        assertEquals("End Of Turn:\nGame Over!\np1 & p2 Win The Game!", outputStreamCaptor.toString().trim().replace("\r",""));
         outputStreamCaptor.reset();
         //one winner
         Game = new Main();
@@ -189,8 +195,15 @@ class MainTest {
         p2.shields = 0;
         p3.shields = 0;
         p4.shields = 7;
+        ps = new ArrayList<>(0);
+        ps.add(p1);
+        ps.add(p2);
+        ps.add(p3);
+        ps.add(p4);
+        Game.players = ps;
         Game.endTurn();
         assertEquals("End Of Turn:\nGame Over!\np4 Wins The Game!", outputStreamCaptor.toString().trim().replace("\r",""));
+        assertEquals(false,Game.game_on);
     }
 
     @AfterEach

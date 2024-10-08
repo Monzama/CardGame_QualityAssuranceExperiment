@@ -10,16 +10,17 @@ public class Player {
     String name;
     ArrayList<AdventureCard> hand;
     int shields;
-
-    public Player(String n) {
+    int id;
+    public Player(String n, int index) {
         handSize = 0;
+        id = index;
         name = n;
         hand = new ArrayList<>(0);
         shields = 0;
     }
 
     public int getShields(){
-        return 0;
+        return shields;
     }
 
     public void addCardToHand(AdventureCard c) {

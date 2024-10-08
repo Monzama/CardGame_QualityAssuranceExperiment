@@ -11,30 +11,61 @@ public class Main {
     ArrayList<Player> players = new ArrayList<Player>(0);
     Player currentPlayer;
     Display display;
+    Boolean game_on;
     public Main(){
         this.GenerateEventDeck();
         this.GenerateAdventureDeck();
         main_deck.shuffle();
         display = new Display();
+        game_on = true;
     }
     public static void main(String[] args) {
         Main main = new Main();
+        main.distributeHands();
+        while(main.game_on == true){
+            //do the game
+            main.nextTurn();
+        }
     }
 
     public void nextTurn (){
         display.displayTurn(currentPlayer);
         display.displayHand(currentPlayer);
+        if (currentPlayer.id == 3){
+            currentPlayer = players.get(0);
+        }else
+            currentPlayer = players.get(currentPlayer.id+1);
     }
 
     public void endTurn(){
+        System.out.println("End Of Turn:");
         //find winner
+        ArrayList<Player> winners= new ArrayList<>(0);
+        for (int i = 0; i < 4; i++) {
+            if (players.get(i).getShields() >=7){winners.add(players.get(i));}
+        }
+        if (winners.size() ==0){
+            System.out.println("No winners, game continues!");
+        } else if (winners.size() == 1) {
+            System.out.println("Game Over!\n" + winners.get(0).name + " Wins The Game!");
+            this.game_on = false;
+        } else if (winners.size() == 2) {
+            System.out.println("Game Over!\n" + winners.get(0).name + " & " + winners.get(1).name + " Win The Game!");
+            this.game_on = false;
+        }else if (winners.size() == 3) {
+            System.out.println("Game Over!\n" + winners.get(0).name + " & " + winners.get(1).name + " & " + winners.get(2).name + " Win The Game!");
+            this.game_on = false;
+        }else if (winners.size() == 4) {
+            System.out.println("Game Over!\nEveryone Wins?!?");
+            this.game_on = false;
+        }
     }
 
     public void distributeHands(){
-        Player p1 = new Player("p1");
-        Player p2 = new Player("p2");
-        Player p3 = new Player("p3");
-        Player p4 = new Player("p4");
+        Player p1 = new Player("p1", 0);
+        Player p2 = new Player("p2",1);
+        Player p3 = new Player("p3",2);
+        Player p4 = new Player("p4",3);
         for (int i = 1; i <=12 ; i++) {
             for (int j = 0; j <4 ; j++) {
                 switch (j){
