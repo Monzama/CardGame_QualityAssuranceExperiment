@@ -373,6 +373,73 @@ class MainTest {
         assertEquals(true, sponsor_hand);
     }
 
+    @Test
+    @DisplayName("The sponsor has entered 'wads' and gets error message")
+    void RESP_13_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "wads").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Q5","Q",5);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Invalid Input, must be an integer");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
+
+    @Test
+    @DisplayName("The sponsor has entered integer out of range and gets error message")
+    void RESP_13_test_02() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "13").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Q5","Q",5);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Invalid Input, must be within size of hand");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
+
+    @Test
+    @DisplayName("The sponsor has entered integer in range and card is invalid (repeated)")
+    void RESP_13_test_03() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "1" +System.lineSeparator() + "2").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        Player sponsor = Game.getPlayer(3);
+        AdventureCard a1 = new AdventureCard("D5","D",5);
+        sponsor.hand.set(0,a1);
+        sponsor.hand.set(1,a1);
+        EventCard e = new EventCard("Q5","Q",5);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Invalid Input, cannot be duplicate weapon");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
+
+    @Test
+    @DisplayName("The sponsor has entered integer in range and card is valid")
+    void RESP_13_test_04() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "1"+System.lineSeparator() + "Quit").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Q5","Q",5);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Card Valid");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
 
     //just to reset sysout
     @AfterEach

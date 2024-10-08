@@ -117,6 +117,7 @@ public class Main {
         }
     }
     public void setupStage(int round, Player sponsor){
+        ArrayList<AdventureCard> stage = new ArrayList<>(0);
         System.out.println("Setup Stage " + round);
         display.displayHand(sponsor);
         String response = display.getMessage(sponsor.name + " Select a card to add to the stage or 'Quit' if done:");
