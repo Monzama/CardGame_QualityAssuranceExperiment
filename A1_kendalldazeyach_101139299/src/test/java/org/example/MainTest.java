@@ -629,15 +629,14 @@ class MainTest {
     @Test
     @DisplayName("The quest ends if there are no participants for the current stage\n")
     void RESP_21_test_01() {
-        ByteArrayInputStream in = new ByteArrayInputStream(("w" + System.lineSeparator() + "w" + System.lineSeparator() + "w").getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(("w" + System.lineSeparator() + "w" + System.lineSeparator() + "w" + System.lineSeparator()).getBytes());
         System.setIn(in);
         Main Game = new Main();
         Game.distributeHands(10);
         Player sponsor = Game.getPlayer(3);
         Quest q = new Quest(1);
-        Game.playStage(q,sponsor);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Game.playStage(null,sponsor);
+        Game.playStage(q,sponsor);
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Quest Finished!");
         assertEquals(true, sponsor_hand);
     }

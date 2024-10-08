@@ -222,6 +222,7 @@ public class Main {
             String response = display.getMessage(eligblep.get(i).name+" Withdraw (w) or Tackle (t)?");
             if (Objects.equals(response, "w")){
                 eligblep.remove(i);
+                i--;
             }else if (!Objects.equals(response, "t")){
                 i--;
                 System.out.println("Incorrect response");
@@ -234,11 +235,13 @@ public class Main {
                 eligblep.get(i);
                 eligblep.get(i).addCardToHand(main_deck.DrawAdventureCard());
             }
+        }else{
+            endQuest(q, sponsor);
         }
     }
 
     public void endQuest(Quest q, Player sponsor){
-
+        System.out.println("Quest Finished!");
     }
 
 
