@@ -54,6 +54,7 @@ public class Player {
         }
         if (index ==-2){
             int n = hand.size() -12;
+            for (int i=0;i<n;i++) {
                 display.clearScreen();
                 sortHand();
                 System.out.println(this.name + " please trim your hand:");
@@ -62,6 +63,10 @@ public class Player {
                 int remove = Integer.parseInt(r);
                 hand.remove(remove-1);
                 handSize--;
+            }
+            sortHand();
+            System.out.print("Trimmed ");
+            display.displayHand(this);
         } else if (index >=0 && index < handSize) {
             hand.remove(index-1);
             handSize--;
