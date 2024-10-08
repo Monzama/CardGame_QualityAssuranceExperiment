@@ -205,7 +205,13 @@ public class Main {
 
     public void playStage(Quest q, Player sponsor){
         //do stuff
-        //by this point, the quest should be setup
+        ArrayList<Player> eligblep = players;
+        eligblep.remove(sponsor);
+        String playerlist = "Eligible Players:";
+        for (int i = 0; i < eligblep.size(); i++){
+            playerlist+= "\n"+eligblep.get(i).name;
+        }
+        System.out.println(playerlist);
     }
 
     public void endTurn(){
