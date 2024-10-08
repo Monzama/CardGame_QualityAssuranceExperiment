@@ -2,6 +2,7 @@ package org.example;
 
 import org.junit.jupiter.api.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.*;
@@ -278,8 +279,21 @@ class MainTest {
         assertEquals(true, redirected);
     }
 
-
-
+    @Test
+    @DisplayName("if a player is in trim hand sequence, they discard until hand size =12")
+    void RESP_09_test_01() {
+        System.setOut(standardOut);
+        Main Game = new Main();
+        Game.distributeHands();
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Game.currentPlayer.hand.add(Game.main_deck.DrawAdventureCard());
+        Game.currentPlayer.handSize++;
+        String data = "1\n";
+        ByteArrayInputStream testIn = new ByteArrayInputStream(data.getBytes());
+        System.setIn(testIn);
+        Boolean h = Game.currentPlayer.trimHand();
+        assertEquals(true, h);
+    }
 
 
 

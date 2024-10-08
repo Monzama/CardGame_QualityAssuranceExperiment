@@ -1,9 +1,11 @@
 package org.example;
 
 import javax.smartcardio.Card;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Scanner;
 
 public class Player {
     int handSize;
@@ -46,11 +48,18 @@ public class Player {
         if (shields < 0){shields = 0;}
     }
 
-    private boolean trimHand(){
+    public boolean trimHand(){
         System.out.println(this.name + " please trim your hand:");
-        return hand.size() > 0;
+        Scanner sc = new Scanner(System.in);
+        if (sc.hasNext()){
+            String index = sc.next();
+            int i = Integer.parseInt(index);
+            sc.close();
+            return false;
+        }else{
+            return handSize == 12;
+        }
     }
-
 
     // Foes in increasing order, then weapons in increasing order, swords before horses.
     public void sortHand() {
