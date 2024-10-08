@@ -241,12 +241,23 @@ public class Main {
     }
 
     public void endQuest(Quest q, Player sponsor){
-        if (q != null){
-            //
-        }else {
-            //
-        }
         System.out.println("Quest Finished!");
+        if (q == null){
+            sponsor.trimHand(2);
+            sponsor.trimHand(2);
+            return;
+        }
+        int counter = 0;
+        for (int i = 0; i < q.stageCount; i++) {
+            for (int j = 0; j < q.stages.get(i).handSize; j++) {
+                counter++;
+                sponsor.hand.remove(q.stages.get(i).hand.get(j));
+                sponsor.handSize--;
+            }
+        }
+        for (int i = 0; i < (counter+ q.stageCount); i++) {
+            sponsor.addCardToHand(main_deck.DrawAdventureCard());
+        }
     }
 
 
