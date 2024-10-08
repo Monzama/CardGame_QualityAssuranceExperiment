@@ -641,6 +641,48 @@ class MainTest {
         assertEquals(true, sponsor_hand);
     }
 
+    @Test
+    @DisplayName("All cards used by the sponsor to build the quest are discarded by the game")
+    void RESP_22_test_01() {
+        Main Game = new Main();
+        Game.distributeHands(10);
+        Player sponsor = Game.getPlayer(3);
+        Quest q = new Quest(2);
+        Player s1 = new Player("Stage 1", -1,Game.display);
+        s1.addCardToHand(new AdventureCard("F5", "F", 5));
+        sponsor.addCardToHand(new AdventureCard("F5", "F", 5));
+        Player s2 = new Player("Stage 2", -1,Game.display);
+        s2.addCardToHand(new AdventureCard("F10", "F", 5));
+        sponsor.addCardToHand(new AdventureCard("F10", "F", 5));
+        q.addStage(s1);
+        q.addStage(s2);
+        int s = sponsor.getHandSize();
+        Game.endQuest(null,sponsor);
+        int d = sponsor.getHandSize();
+        assertEquals((s-2), d);
+    }
+
+    @Test
+    @DisplayName("Who then draws the same number of cards + the number of stages, and then possibly trims their hand")
+    void RESP_22_test_02() {
+        Main Game = new Main();
+        Game.distributeHands(8);
+        Player sponsor = Game.getPlayer(3);
+        Quest q = new Quest(2);
+        Player s1 = new Player("Stage 1", -1,Game.display);
+        s1.addCardToHand(new AdventureCard("F5", "F", 5));
+        sponsor.addCardToHand(new AdventureCard("F5", "F", 5));
+        Player s2 = new Player("Stage 2", -1,Game.display);
+        s2.addCardToHand(new AdventureCard("F10", "F", 5));
+        sponsor.addCardToHand(new AdventureCard("F10", "F", 5));
+        q.addStage(s1);
+        q.addStage(s2);
+        int s = sponsor.getHandSize();
+        Game.endQuest(q,sponsor);
+        int d = sponsor.getHandSize();
+        assertEquals((s+2),d);
+    }
+
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {

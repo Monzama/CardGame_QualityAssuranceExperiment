@@ -241,6 +241,11 @@ public class Main {
     }
 
     public void endQuest(Quest q, Player sponsor){
+        if (q != null){
+            //
+        }else {
+            //
+        }
         System.out.println("Quest Finished!");
     }
 
