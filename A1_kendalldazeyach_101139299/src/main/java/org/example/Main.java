@@ -108,13 +108,21 @@ public class Main {
             }
         }
         if (sponsor != null){
+            System.out.println(sponsor.name+ " Sponsors The Quest!");
             //do the quest setup
             for (int i = 0; i < questValue; i++) {
                 //do something
+                setupStage(i);
             }
         }
     }
+    public void setupStage(int round){
 
+    }
+
+    public void playStage(){
+
+    }
 
     public void endTurn(){
         System.out.println("End Of Turn:");

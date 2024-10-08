@@ -158,7 +158,7 @@ class MainTest {
         p.sortHand();
         Game.currentPlayer = p;
         Game.nextTurn();
-        assertEquals("Current Player: p1\nHand:\nF5\nF5\nF15\nF25\nF50\nD5\nS10\nS10\nH10\nH10\nB15\nE30", outputStreamCaptor.toString().trim().replace("\r",""));
+        assertEquals("Current Player: p1\nHand:\n1: F5\n2: F5\n3: F15\n4: F25\n5: F50\n6: D5\n7: S10\n8: S10\n9: H10\n10: H10\n11: B15\n12: E30", outputStreamCaptor.toString().trim().replace("\r",""));
     }
 
 
@@ -339,6 +339,40 @@ class MainTest {
         //check the display
         assertEquals(true, quest_fail);
     }
+
+    @Test
+    @DisplayName("The sponsor has been selected and hand displayed")
+    void RESP_12_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Q5","Q",5);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Hand:");
+        sponsor_hand = sponsor_hand && outputStreamCaptor.toString().trim().replace("\r","").contains("Sponsors The Quest!");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
+
+    @Test
+    @DisplayName("The sponsor has been prompted for the position of the next card or 'Quit'")
+    void RESP_12_test_02() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Q5","Q",5);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Select a card to add to the stage or 'Quit' if done");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
+
 
     //just to reset sysout
     @AfterEach

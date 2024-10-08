@@ -27,7 +27,7 @@ public class Display {
         System.out.println("Hand:");
         ArrayList<AdventureCard> hand = p.getHand();
         for (int i = 0; i < p.getHandSize(); i++) {
-            System.out.println(hand.get(i).GetCardName());
+            System.out.println((i+1) + ": " + hand.get(i).GetCardName());
         }
     }
 }
