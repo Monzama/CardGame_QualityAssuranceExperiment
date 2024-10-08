@@ -125,14 +125,16 @@ public class Main {
         while (r_add){
             String response = display.getMessage(sponsor.name + " Select a card to add to the stage or 'Quit' if done:");
             if (Objects.equals(response, "Quit")){
-                //empty stage
+                if (stage_obj.hand.isEmpty()){
                     //stage empty error
-                    //System.out.println("A stage cannot be empty");
+                    System.out.println("A stage cannot be empty");
+                }else{
                     //stage ready to play
                     stage_obj.sortHand();
                     System.out.println("Setup Finished");
                     display.displayHand(stage_obj);
                     r_add = false;
+                }
             }else{
                 int index = -1;
                 try {
