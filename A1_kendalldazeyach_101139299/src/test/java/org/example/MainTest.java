@@ -570,11 +570,40 @@ class MainTest {
         Main Game = new Main();
         Game.distributeHands();
         Player sponsor = Game.getPlayer(3);
-        Quest q = new Quest(1);
-        Game.playStage(q,sponsor);
+        Game.playStage(null,sponsor);
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Eligible Players:\np1\np2\np3");
         //check the display
         assertEquals(true, sponsor_hand);
+    }
+
+    @Test
+    @DisplayName("The game asks each player if the withdraw or tackle")
+    void RESP_19_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() + "t" + System.lineSeparator() + "t").getBytes());
+        System.setIn(in);
+        Main Game = new Main();
+        Game.distributeHands();
+        Player sponsor = Game.getPlayer(3);
+        Quest q = new Quest(1);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Game.playStage(q,sponsor);
+        //check the display
+        assertEquals("Eligible Players:\np1\np2\np3\np1 Withdraw (w) or Tackle (t)?:\np2 Withdraw (w) or Tackle (t)?:\np3 Withdraw (w) or Tackle (t)?:",outputStreamCaptor.toString().trim().replace("\r",""));
+    }
+
+    @Test
+    @DisplayName("A participant who withdraws is no longer eligble for next stages")
+    void RESP_19_test_02() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() + "t" + System.lineSeparator() + "w").getBytes());
+        System.setIn(in);
+        Main Game = new Main();
+        Game.distributeHands();
+        Player sponsor = Game.getPlayer(3);
+        Quest q = new Quest(1);
+        Game.playStage(q,sponsor);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Game.playStage(null,sponsor);
+        assertEquals("Eligible Players:\np1\np2",outputStreamCaptor.toString().trim().replace("\r",""));
     }
 
 

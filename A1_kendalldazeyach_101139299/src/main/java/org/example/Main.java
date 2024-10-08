@@ -212,6 +212,9 @@ public class Main {
             playerlist+= "\n"+eligblep.get(i).name;
         }
         System.out.println(playerlist);
+        if (q ==null){
+            return;
+        }
     }
 
     public void endTurn(){
