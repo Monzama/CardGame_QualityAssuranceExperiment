@@ -73,8 +73,132 @@ public class Player {
         }
         return handSize == 12;
     }
+    //yes...this is a wicked algorithm
+    //basically it just outlines the scenarios that would limit a player from being able to fully stage the quest
+    //note, this tells IF it is possible
+    //a player can still make a mistake and not stage the quest properly
+    //there will be a reset input added to redo staging
     public boolean canSponsor(int stageCount) {
+        if (stageCount <=1){
+            return true;
+        }
+        //here we determine if the player has enough cards to sponsor
+        if (stageCount > handSize) {
+            return false;
+        }
+        //loop through hand, form the worst case scenario.
+        sortHand();
+        ArrayList<AdventureCard> cards = new ArrayList<>(hand);
+        if (!Objects.equals(cards.get(stageCount - 1).type, "F")){
+            return false;
+        }
+        int prevVal = 0;
+        int val = 0;
+        int indexsearch = 0;
+        AdventureCard c;
+        AdventureCard prev;
+        int s = 0;
+        while (s < stageCount){
+            if (cards.isEmpty()){
+                return false;
+            }else {
+                c = cards.get(indexsearch);
+                if (val > prevVal) {
+                    prevVal = val;
+                    val = 0;
+                    s++;
+                }else if (Objects.equals(c.type, "F") && val ==0){
+                    cards.removeFirst();
+                    val +=c.value;
+                } else if (Objects.equals(c.type, "F") && val !=0) {
+                    if (cards.size() > indexsearch){
+                        indexsearch++;
+                        c = cards.get(indexsearch);
+                    }else{
+                        return false;
+                    }
+                }else{
+                    if (c.value+val > prevVal) {
+                        c = cards.remove(indexsearch);
+                        prevVal = (c.value+val);
+                        val = 0;
+                        indexsearch = 0;
+                        s++;
+                    }else{
+                        if (cards.size() <= indexsearch+2){return false;}
+                        //now we have to check for multiple weapons
+                        if (c.value + cards.get(indexsearch+1).value >= cards.get(indexsearch+2).value) {
+                            if (cards.get(indexsearch+2).value + val > prevVal) {
+                                prevVal = (c.value+val+cards.get(indexsearch+2).value);
+                                cards.remove(c);
+                                c = cards.remove(indexsearch+2);
+                                val = 0;
+                                indexsearch = 0;
+                                s++;
+                            } else if (c.value + cards.get(indexsearch+1).value > prevVal) {
+                                prevVal = (c.value + val + cards.get(indexsearch + 1).value);
+                                cards.remove(c);
+                                c = cards.remove(indexsearch + 1);
+                                val = 0;
+                                indexsearch = 0;
+                                s++;
+                            }else if (c.value + cards.get(indexsearch+1).value + cards.get(indexsearch+2).value > prevVal) {
+                                prevVal = (c.value+val + cards.get(indexsearch+2).value + cards.get(indexsearch+1).value);
+                                cards.remove(c);
+                                c = cards.remove(indexsearch+1);
+                                c = cards.remove(indexsearch+2);
+                                val = 0;
+                                indexsearch = 0;
+                                s++;
+                            }else{
+                                return false;
+                            }
+                        }else {
+                            if (c.value + cards.get(indexsearch+1).value > prevVal) {
+                                prevVal = (c.value+val+ cards.get(indexsearch+1).value);
+                                cards.remove(c);
+                                c = cards.remove(indexsearch+1);
+                                val = 0;
+                                indexsearch = 0;
+                                s++;
+                            }else if (cards.get(indexsearch+2).value + val > prevVal) {
+                                prevVal = (c.value+val+cards.get(indexsearch+2).value);
+                                cards.remove(c);
+                                c = cards.remove(indexsearch+2);
+                                val = 0;
+                                indexsearch = 0;
+                                s++;
+                            } else if (c.value + cards.get(indexsearch+2).value> prevVal) {
+                                prevVal = (c.value+val + cards.get(indexsearch+2).value + cards.get(indexsearch+1).value);
+                                cards.remove(c);
+                                c = cards.remove(indexsearch+1);
+                                c = cards.remove(indexsearch+2);
+                                val = 0;
+                                indexsearch = 0;
+                                s++;
+                            } else if (cards.get(indexsearch+1).value + cards.get(indexsearch+2).value> prevVal) {
+                                prevVal = (val + cards.get(indexsearch + 2).value + cards.get(indexsearch + 1).value);
+                                c = cards.remove(indexsearch + 1);
+                                c = cards.remove(indexsearch + 2);
+                                val = 0;
+                                indexsearch = 0;
+                                s++;
+                            }else if (c.value + cards.get(indexsearch+1).value + cards.get(indexsearch+2).value > prevVal) {
+                                prevVal = (val + cards.get(indexsearch + 2).value + cards.get(indexsearch + 1).value);
+                                c = cards.remove(indexsearch + 1);
+                                c = cards.remove(indexsearch + 2);
+                                val = 0;
+                                indexsearch = 0;
+                                s++;
+                            }else{
+                                return false;
+                            }
 
+                        }
+                    }
+                }
+            }
+        }
         return true;
     }
 
