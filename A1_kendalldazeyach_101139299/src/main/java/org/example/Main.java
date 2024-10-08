@@ -113,27 +113,43 @@ public class Main {
             System.out.println("Setup Stage 1");
             display.displayHand(sponsor);
             //do the quest setup
+            Quest q = new Quest(questValue);
             for (int i = 0; i < questValue; i++) {
                 //do something
-                setupStage(i, sponsor);
+                Player s = setupStage((i+1), sponsor, q.previousStage);
+                q.addStage(s);
             }
         }
     }
-    public void setupStage(int round, Player sponsor){
-        Player stage_obj = new Player("Stage 1", -1, display);
-        boolean r_add = true;
-        while (r_add){
+    public Player setupStage(int round, Player sponsor, Player prev){
+        Player stage_obj = new Player("Stage" + round, -1, display);
+        int value = 0;
+        while (true){
             String response = display.getMessage(sponsor.name + " Select a card to add to the stage or 'Quit' if done:");
             if (Objects.equals(response, "Quit")){
                 if (stage_obj.hand.isEmpty()){
                     //stage empty error
                     System.out.println("A stage cannot be empty");
                 }else{
-                    //stage ready to play
-                    stage_obj.sortHand();
-                    System.out.println("Setup Finished");
-                    display.displayHand(stage_obj);
-                    r_add = false;
+                    if (prev !=null){
+                        if (prev.shields >= value){
+                            System.out.println("A stage cannot be less than the previous");
+                        }else{
+                            //stage ready to play
+                            stage_obj.sortHand();
+                            stage_obj.shields = value;
+                            System.out.println("Setup Finished");
+                            display.displayHand(stage_obj);
+                            return stage_obj;
+                        }
+                    }else{
+                        //stage ready to play
+                        stage_obj.sortHand();
+                        stage_obj.shields = value;
+                        System.out.println("Setup Finished");
+                        display.displayHand(stage_obj);
+                        return stage_obj;
+                    }
                 }
             }else{
                 int index = -1;
@@ -155,6 +171,7 @@ public class Main {
                         }else{
                             System.out.println("Card Valid");
                             stage_obj.hand.add(card);
+                            value = card.GetCardValue();
                         }
 
                     }else if (stage_obj.hand.isEmpty()){
@@ -162,12 +179,13 @@ public class Main {
                     }else{
                         System.out.println("Card Valid");
                         stage_obj.hand.add(card);
+                        value = card.GetCardValue();
                     }
                 }
 
             }
         }
-
+        return null;
     }
 
     public void playStage(){
