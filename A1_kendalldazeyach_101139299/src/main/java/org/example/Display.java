@@ -26,7 +26,11 @@ public class Display {
         System.out.println("Current Player: " + p.getName());
     }
     public void displayHand(Player p){
-        System.out.println("Hand:");
+        if (p.id ==-1){
+            System.out.println("Stage:");
+        }else{
+            System.out.println("Hand:");
+        }
         ArrayList<AdventureCard> hand = p.getHand();
         for (int i = 0; i < p.getHandSize(); i++) {
             System.out.println((i+1) + ": " + hand.get(i).GetCardName());

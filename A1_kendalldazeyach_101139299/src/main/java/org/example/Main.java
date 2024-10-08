@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 public class Main {
@@ -119,18 +120,20 @@ public class Main {
         }
     }
     public void setupStage(int round, Player sponsor){
-        ArrayList<AdventureCard> stage = new ArrayList<>(0);
+        Player stage_obj = new Player("Stage 1", -1, display);
         boolean r_add = true;
-        while (r_add == true){
+        while (r_add){
             String response = display.getMessage(sponsor.name + " Select a card to add to the stage or 'Quit' if done:");
             if (Objects.equals(response, "Quit")){
-                if (stage.isEmpty()){
+                if (stage_obj.hand.isEmpty()){
                     //stage empty error
                     System.out.println("A stage cannot be empty");
                 }else{
                     //stage ready to play
+                    stage_obj.sortHand();
+                    System.out.println("Setup Finished");
+                    display.displayHand(stage_obj);
                     r_add = false;
-                    System.out.println("Stage set");
                 }
             }else{
                 int index = -1;
@@ -144,21 +147,21 @@ public class Main {
                     System.out.println("Invalid Input, must be within size of hand");
                 }else{
                     AdventureCard card = sponsor.hand.get(index-1);
-                    if (stage.contains(card) && !Objects.equals(card.GetCardType(), "F")){
+                    if (stage_obj.hand.contains(card) && !Objects.equals(card.GetCardType(), "F")){
                         System.out.println("Invalid Input, cannot be duplicate weapon");
                     }else if (Objects.equals(card.GetCardType(), "F")){
-                        if (stage.contains(card)){
+                        if (stage_obj.hand.contains(card)){
                             System.out.println("Invalid Card, a stage cannot have more than one foe");
                         }else{
                             System.out.println("Card Valid");
-                            stage.add(card);
+                            stage_obj.hand.add(card);
                         }
 
-                    }else if (stage.isEmpty()){
+                    }else if (stage_obj.hand.isEmpty()){
                         System.out.println("Invalid Card, a stage cannot have a weapon and no foe");
                     }else{
                         System.out.println("Card Valid");
-                        stage.add(card);
+                        stage_obj.hand.add(card);
                     }
                 }
 
