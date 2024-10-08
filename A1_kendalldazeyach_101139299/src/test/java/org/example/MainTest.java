@@ -8,7 +8,9 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MainTest {
-
+    private final PrintStream standardOut = System.out;
+    private final InputStream standardin = System.in;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
     @Test
     @DisplayName("check deck size is Adventure deck(100)")
     void RESP_01_test_01() {
@@ -133,9 +135,6 @@ class MainTest {
         assertEquals(52, deckSize, "Deck size should be 52");
     }
 
-    private final PrintStream standardOut = System.out;
-    private final InputStream standardin = System.in;
-    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
     @Test
     @DisplayName("The Game indicates whose turn it is and displays their hand")
     void RESP_03_test_01() {
@@ -604,6 +603,28 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Game.playStage(null,sponsor);
         assertEquals("Eligible Players:\np1\np2",outputStreamCaptor.toString().trim().replace("\r",""));
+    }
+
+    @Test
+    @DisplayName("An eligible participant who chooses to participate draws 1 adventure card and possibly trims their hand (UC-03)\n")
+    void RESP_20_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() + "t" + System.lineSeparator() + "w").getBytes());
+        System.setIn(in);
+        Main Game = new Main();
+        Game.distributeHands();
+        Player sponsor = Game.getPlayer(3);
+        Player p1 = Game.getPlayer(0);
+        Player p2 = Game.getPlayer(1);
+        Player p3 = Game.getPlayer(2);
+        p1.trimHand(2);
+        p1.trimHand(2);
+        p2.trimHand(2);
+        p3.trimHand(2);
+        Quest q = new Quest(1);
+        Game.playStage(q,sponsor);
+        assertEquals(11, p1.handSize);
+        assertEquals(12, p2.handSize);
+        assertEquals(11, p3.handSize);
     }
 
 
