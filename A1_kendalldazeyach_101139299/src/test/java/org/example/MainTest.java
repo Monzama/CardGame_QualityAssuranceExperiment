@@ -537,6 +537,33 @@ class MainTest {
     }
 
 
+    @Test
+    @DisplayName("The sponsor has entered 'Quit' and the stage is less than the previous. The sponsor now adds another card and the stage value is greater")
+    void RESP_17_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "yes" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" + System.lineSeparator()+ "1" + System.lineSeparator() + "Quit"+ System.lineSeparator() + "3"+ System.lineSeparator() + "Quit" + System.lineSeparator() + "2" + System.lineSeparator() + "Quit").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        Player sponsor = Game.getPlayer(3);
+        AdventureCard a1 = new AdventureCard("F5","F",5);
+        AdventureCard a2 = new AdventureCard("D5","D",5);
+        sponsor.hand.set(0,a1);
+        sponsor.hand.set(1,a2);
+        sponsor.hand.set(2,a1);
+        sponsor.hand.set(3,a1);
+        Game.players.set(3,sponsor);
+        Player badsponsor = new Player("p1", 1, Game.display);
+        Game.players.set(1,badsponsor);
+        EventCard e = new EventCard("Q5","Q",2);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Cannot sponsor with the current hand");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
+
+
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {

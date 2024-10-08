@@ -102,8 +102,15 @@ public class Main {
                     offer = players.get(offer.id+1);
                 }
             }else if (Objects.equals(ans, "yes")){
-                sponsor = offer;
-                break;
+                //check if sponsor is valid
+                if (offer.canSponsor(questValue)){
+                    sponsor = offer;
+                    break;
+                }else{
+                    System.out.println(offer.name + "Cannot sponsor with the current hand");
+                    offer = players.get(offer.id+1);
+                }
+
             }else {
                 System.out.println("Invalid Input");
             }
@@ -172,6 +179,8 @@ public class Main {
                             System.out.println("Card Valid");
                             stage_obj.hand.add(card);
                             value = card.GetCardValue();
+                            stage_obj.sortHand();
+                            display.displayHand(stage_obj);
                         }
 
                     }else if (stage_obj.hand.isEmpty()){
@@ -180,6 +189,8 @@ public class Main {
                         System.out.println("Card Valid");
                         stage_obj.hand.add(card);
                         value = card.GetCardValue();
+                        stage_obj.sortHand();
+                        display.displayHand(stage_obj);
                     }
                 }
 

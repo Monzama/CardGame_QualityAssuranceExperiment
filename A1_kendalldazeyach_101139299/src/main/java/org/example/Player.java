@@ -2,6 +2,8 @@ package org.example;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
 
 public class Player {
     int handSize;
@@ -71,6 +73,11 @@ public class Player {
         }
         return handSize == 12;
     }
+    public boolean canSponsor(int stageCount) {
+
+        return true;
+    }
+
 
     // Foes in increasing order, then weapons in increasing order, swords before horses.
     public void sortHand() {
