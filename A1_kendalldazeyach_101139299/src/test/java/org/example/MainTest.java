@@ -143,7 +143,7 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        Player p = new Player("p1",0);
+        Player p = new Player("p1",0, Game.display);
         p.addCardToHand(new AdventureCard("F5","F",5));
         p.addCardToHand(new AdventureCard("F15","F",15));
         p.addCardToHand(new AdventureCard("F25","F",25));
@@ -172,10 +172,10 @@ class MainTest {
         Game.distributeHands();
         //manufacture win condition here
         //multiple winners
-        Player p1 = new Player("p1",0);
-        Player p2 = new Player("p2",1);
-        Player p3 = new Player("p3",2);
-        Player p4 = new Player("p4",3);
+        Player p1 = new Player("p1",0, Game.display);
+        Player p2 = new Player("p2",1,Game.display);
+        Player p3 = new Player("p3",2,Game.display);
+        Player p4 = new Player("p4",3,Game.display);
         p1.shields = 7;
         p2.shields = 7;
         p3.shields = 6;
@@ -273,7 +273,9 @@ class MainTest {
         Main Game = new Main();
         Game.distributeHands();
         System.setOut(new PrintStream(outputStreamCaptor));
-        Game.currentPlayer.addCardToHand(Game.main_deck.DrawAdventureCard());
+        Game.currentPlayer.hand.add(Game.main_deck.DrawAdventureCard());
+        Game.currentPlayer.handSize++;
+        Game.currentPlayer.trimHand(-1);
         String out = outputStreamCaptor.toString().trim();
         Boolean redirected = (out.contains(Game.currentPlayer.name + " please trim your hand:"));
         assertEquals(true, redirected);
@@ -291,7 +293,7 @@ class MainTest {
         String data = "1\n";
         ByteArrayInputStream testIn = new ByteArrayInputStream(data.getBytes());
         System.setIn(testIn);
-        Boolean h = Game.currentPlayer.trimHand();
+        Boolean h = Game.currentPlayer.trimHand(1);
         assertEquals(true, h);
     }
 

@@ -1,7 +1,5 @@
 package org.example;
 
-import javax.smartcardio.Card;
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,8 +11,10 @@ public class Player {
     ArrayList<AdventureCard> hand;
     int shields;
     int id;
-    public Player(String n, int index) {
+    Display display;
+    public Player(String n, int index, Display d) {
         handSize = 0;
+        display = d;
         id = index;
         name = n;
         hand = new ArrayList<>(0);
@@ -28,7 +28,7 @@ public class Player {
     public void addCardToHand(AdventureCard c) {
         hand.add(c);
         handSize++;
-        if (handSize > 12) {trimHand();}
+        if (handSize > 12) {trimHand(-2);}
     }
 
     public int getHandSize() {
@@ -48,17 +48,26 @@ public class Player {
         if (shields < 0){shields = 0;}
     }
 
-    public boolean trimHand(){
-        System.out.println(this.name + " please trim your hand:");
-        Scanner sc = new Scanner(System.in);
-        if (sc.hasNext()){
-            String index = sc.next();
-            int i = Integer.parseInt(index);
-            sc.close();
-            return false;
-        }else{
-            return handSize == 12;
+    public boolean trimHand(int index){
+        if (index==-1){
+            System.out.println(this.name + " please trim your hand:");
         }
+        if (index ==-2){
+            int n = hand.size() -12;
+                display.clearScreen();
+                sortHand();
+                System.out.println(this.name + " please trim your hand:");
+                display.displayHand(this);
+                String r = display.getMessage("Please select your card (1-" + handSize + ")");
+                int remove = Integer.parseInt(r);
+                hand.remove(remove-1);
+                handSize--;
+        } else if (index >=0 && index < handSize) {
+            hand.remove(index-1);
+            handSize--;
+        }
+        return handSize == 12;
+        
     }
 
     // Foes in increasing order, then weapons in increasing order, swords before horses.

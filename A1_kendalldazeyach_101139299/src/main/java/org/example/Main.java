@@ -12,10 +12,10 @@ public class Main {
     Boolean game_on;
     EventCard current_event;
     public Main(){
+        display = new Display();
         this.GenerateEventDeck();
         this.GenerateAdventureDeck();
         main_deck.shuffle();
-        display = new Display();
         game_on = true;
     }
     public static void main(String[] args) {
@@ -24,11 +24,14 @@ public class Main {
         while(main.game_on == true){
             //do the game
             main.nextTurn();
+            main.currentPlayer.addCardToHand(main.main_deck.DrawAdventureCard());
+            //main.currentPlayer.trimHand();
         }
     }
 
     public void nextTurn (){
         display.displayTurn(currentPlayer);
+        currentPlayer.sortHand();
         display.displayHand(currentPlayer);
         if (currentPlayer.id == 3){
             currentPlayer = players.get(0);
@@ -104,10 +107,10 @@ public class Main {
     }
 
     public void distributeHands(){
-        Player p1 = new Player("p1", 0);
-        Player p2 = new Player("p2",1);
-        Player p3 = new Player("p3",2);
-        Player p4 = new Player("p4",3);
+        Player p1 = new Player("p1", 0, display);
+        Player p2 = new Player("p2",1,display);
+        Player p3 = new Player("p3",2,display);
+        Player p4 = new Player("p4",3,display);
         for (int i = 1; i <=12 ; i++) {
             for (int j = 0; j <4 ; j++) {
                 switch (j){
