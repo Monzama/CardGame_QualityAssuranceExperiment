@@ -348,7 +348,7 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
         Game.distributeHands();
-        EventCard e = new EventCard("Q5","Q",-1);
+        EventCard e = new EventCard("Q5","t",-1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Hand:");
@@ -371,7 +371,7 @@ class MainTest {
         sponsor.hand.set(0,a1);
         sponsor.hand.set(1,a2);
         Game.players.set(3,sponsor);
-        EventCard e = new EventCard("Q5","Q",1);
+        EventCard e = new EventCard("Q5","t",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Select a card to add to the stage or 'Quit' if done");
@@ -393,7 +393,7 @@ class MainTest {
         sponsor.hand.set(0,a1);
         sponsor.hand.set(1,a2);
         Game.players.set(3,sponsor);
-        EventCard e = new EventCard("Q5","Q",1);
+        EventCard e = new EventCard("Q5","t",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Invalid Input, must be an integer");
@@ -415,7 +415,7 @@ class MainTest {
         sponsor.hand.set(0,a1);
         sponsor.hand.set(1,a2);
         Game.players.set(3,sponsor);
-        EventCard e = new EventCard("Q5","Q",1);
+        EventCard e = new EventCard("Q5","t",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Invalid Input, must be within size of hand");
@@ -438,7 +438,7 @@ class MainTest {
         sponsor.hand.set(1,a2);
         sponsor.hand.set(2,a2);
         Game.players.set(3,sponsor);
-        EventCard e = new EventCard("Q5","Q",1);
+        EventCard e = new EventCard("Q5","t",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Invalid Input, cannot be duplicate weapon");
@@ -458,7 +458,7 @@ class MainTest {
         AdventureCard a1 = new AdventureCard("F5","F",5);
         sponsor.hand.set(0,a1);
         Game.players.set(3,sponsor);
-        EventCard e = new EventCard("Q5","Q",1);
+        EventCard e = new EventCard("Q5","t",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Card Valid");
@@ -479,7 +479,7 @@ class MainTest {
         AdventureCard a1 = new AdventureCard("F5","F",5);
         sponsor.hand.set(0,a1);
         Game.players.set(3,sponsor);
-        EventCard e = new EventCard("Q5","Q",1);
+        EventCard e = new EventCard("Q5","t",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Stage:");
@@ -503,7 +503,7 @@ class MainTest {
         sponsor.hand.set(0,a1);
         sponsor.hand.set(1,a2);
         Game.players.set(3,sponsor);
-        EventCard e = new EventCard("Q5","Q",1);
+        EventCard e = new EventCard("Q5","t",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("A stage cannot be empty");
@@ -527,7 +527,7 @@ class MainTest {
         sponsor.hand.set(2,a1);
         sponsor.hand.set(3,a1);
         Game.players.set(3,sponsor);
-        EventCard e = new EventCard("Q5","Q",2);
+        EventCard e = new EventCard("Q5","t",2);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("A stage cannot be less than the previous");
@@ -555,7 +555,7 @@ class MainTest {
         Game.players.set(3,sponsor);
         Player badsponsor = new Player("p1", 1, Game.display);
         Game.players.set(1,badsponsor);
-        EventCard e = new EventCard("Q5","Q",2);
+        EventCard e = new EventCard("Q5","t",2);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Cannot sponsor with the current hand");

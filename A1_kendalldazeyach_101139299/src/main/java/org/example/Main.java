@@ -79,7 +79,7 @@ public class Main {
                 break;
 
         }
-        if (Objects.equals(current_event.GetCardType(), "Q")){
+        if (!Objects.equals(current_event.GetCardType(), "E")){
             initiateQuest(current_event.GetCardValue());
         }
     }
@@ -126,9 +126,11 @@ public class Main {
                 Player s = setupStage((i+1), sponsor, q.previousStage);
                 q.addStage(s);
             }
-            display.clearScreen();
-            //by this point, the quest should be setup
-            playStage(q,sponsor);
+            if (!Objects.equals(current_event.type, "t")){
+                display.clearScreen();
+                //by this point, the quest should be setup
+                playStage(q,sponsor);
+            }
         }
 
     }
@@ -214,6 +216,17 @@ public class Main {
         System.out.println(playerlist);
         if (q ==null){
             return;
+        }
+        //prompt players here
+        for (int i = 0; i < eligblep.size(); i++){
+            String response = display.getMessage(eligblep.get(i).name+" Withdraw (w) or Tackle (t)?");
+            if (Objects.equals(response, "w")){
+                eligblep.remove(i);
+            }else if (!Objects.equals(response, "t")){
+                i--;
+                System.out.println("Incorrect response");
+            }
+            System.out.println();
         }
     }
 
