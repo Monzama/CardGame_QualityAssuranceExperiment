@@ -2,9 +2,7 @@ package org.example;
 
 import org.junit.jupiter.api.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -136,6 +134,7 @@ class MainTest {
     }
 
     private final PrintStream standardOut = System.out;
+    private final InputStream standardin = System.in;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
     @Test
     @DisplayName("The Game indicates whose turn it is and displays their hand")
@@ -282,12 +281,10 @@ class MainTest {
     }
 
     @Test
-    @DisplayName("if a player is in trim hand sequence, they discard until hand size =12")
+    @DisplayName("if a player is in trim hand sequence, they correctly discard a card")
     void RESP_09_test_01() {
-        System.setOut(standardOut);
         Main Game = new Main();
         Game.distributeHands();
-        System.setOut(new PrintStream(outputStreamCaptor));
         Game.currentPlayer.hand.add(Game.main_deck.DrawAdventureCard());
         Game.currentPlayer.handSize++;
         String data = "1\n";
@@ -297,11 +294,27 @@ class MainTest {
         assertEquals(true, h);
     }
 
+    @Test
+    @DisplayName("if a player is in trim hand sequence, they kleep discarding until handsize =12")
+    void RESP_10_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + System.lineSeparator() + "2").getBytes());
+        System.setIn(in);
+        Main Game = new Main();
+        Game.distributeHands();
+        Game.currentPlayer.hand.add(Game.main_deck.DrawAdventureCard());
+        Game.currentPlayer.handSize++;
+        Game.currentPlayer.hand.add(Game.main_deck.DrawAdventureCard());
+        Game.currentPlayer.handSize++;
+        Game.currentPlayer.trimHand(-2);
+        assertEquals(12, Game.currentPlayer.handSize);
+    }
+
 
 
     //just to reset sysout
     @AfterEach
-    void normalPrint(){
+    void normalPrint() throws IOException {
         System.setOut(standardOut);
+        System.setIn(standardin);
     }
 }
