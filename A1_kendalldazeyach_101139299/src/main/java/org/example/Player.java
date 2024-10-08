@@ -42,6 +42,7 @@ public class Player {
 
     public void adjustShields(int mod){
         shields += mod;
+        if (shields < 0){shields = 0;}
     }
 
 
