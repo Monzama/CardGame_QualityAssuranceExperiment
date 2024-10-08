@@ -237,6 +237,11 @@ public class Main {
         }
     }
 
+    public void endQuest(Quest q, Player sponsor){
+
+    }
+
+
     public void endTurn(){
         System.out.println("End Of Turn:");
 

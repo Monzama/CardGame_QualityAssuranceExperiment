@@ -535,7 +535,6 @@ class MainTest {
         assertEquals(true, sponsor_hand);
     }
 
-
     @Test
     @DisplayName("The sponsor has entered 'Quit' and the stage is less than the previous. The sponsor now adds another card and the stage value is greater")
     void RESP_17_test_01() {
@@ -626,7 +625,23 @@ class MainTest {
         assertEquals(12, p2.handSize);
         assertEquals(11, p3.handSize);
     }
-    
+
+    @Test
+    @DisplayName("The quest ends if there are no participants for the current stage\n")
+    void RESP_21_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("w" + System.lineSeparator() + "w" + System.lineSeparator() + "w").getBytes());
+        System.setIn(in);
+        Main Game = new Main();
+        Game.distributeHands(10);
+        Player sponsor = Game.getPlayer(3);
+        Quest q = new Quest(1);
+        Game.playStage(q,sponsor);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Game.playStage(null,sponsor);
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Quest Finished!");
+        assertEquals(true, sponsor_hand);
+    }
+
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {
