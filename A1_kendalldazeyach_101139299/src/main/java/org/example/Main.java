@@ -21,7 +21,7 @@ public class Main {
     }
     public static void main(String[] args) {
         Main main = new Main();
-        main.distributeHands();
+        main.distributeHands(12);
         while(main.game_on == true){
             //do the game
             main.nextTurn();
@@ -228,6 +228,13 @@ public class Main {
             }
             System.out.println();
         }
+        //should only be the participants here
+        if (eligblep.size()>0){
+            for (int i = 0; i < eligblep.size(); i++){
+                eligblep.get(i);
+                eligblep.get(i).addCardToHand(main_deck.DrawAdventureCard());
+            }
+        }
     }
 
     public void endTurn(){
@@ -256,12 +263,12 @@ public class Main {
         }
     }
 
-    public void distributeHands(){
+    public void distributeHands(int count){
         Player p1 = new Player("p1", 0, display);
         Player p2 = new Player("p2",1,display);
         Player p3 = new Player("p3",2,display);
         Player p4 = new Player("p4",3,display);
-        for (int i = 1; i <=12 ; i++) {
+        for (int i = 1; i <=count ; i++) {
             for (int j = 0; j <4 ; j++) {
                 switch (j){
                     case 0:

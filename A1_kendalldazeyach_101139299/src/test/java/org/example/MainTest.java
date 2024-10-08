@@ -118,7 +118,7 @@ class MainTest {
     @DisplayName("Distribute 12 cards to each player")
     void RESP_02_test_01() {
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Boolean lessThanTwelve = false;
         for (int i = 0; i < 4; i++) {
             Player p = Game.getPlayer(i);
@@ -130,7 +130,7 @@ class MainTest {
     @DisplayName("Deck is updated, should now have 52 cards")
     void RESP_02_test_02() {
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         int deckSize = Game.main_deck.getA_deck_size();
         assertEquals(52, deckSize, "Deck size should be 52");
     }
@@ -140,7 +140,7 @@ class MainTest {
     void RESP_03_test_01() {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player p = new Player("p1",0, Game.display);
         p.addCardToHand(new AdventureCard("F5","F",5));
         p.addCardToHand(new AdventureCard("F15","F",15));
@@ -167,7 +167,7 @@ class MainTest {
         outputStreamCaptor.reset();
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         //manufacture win condition here
         //multiple winners
         Player p1 = new Player("p1",0, Game.display);
@@ -189,7 +189,7 @@ class MainTest {
         outputStreamCaptor.reset();
         //one winner
         Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         p1.shields = 0;
         p2.shields = 0;
         p3.shields = 0;
@@ -210,7 +210,7 @@ class MainTest {
     void RESP_05_test_01() {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         EventCard e = new EventCard("Q5","Q", 10);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
@@ -223,7 +223,7 @@ class MainTest {
     void RESP_06_test_01() {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         EventCard e = new EventCard("Plague","E",0);
         Game.currentPlayer.shields = 3;
         int cur_shields = Game.currentPlayer.shields;
@@ -246,7 +246,7 @@ class MainTest {
     void RESP_06_test_02() {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         EventCard e = new EventCard("Plague","E",0);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
@@ -258,7 +258,7 @@ class MainTest {
     @DisplayName("player gains or loses shields")
     void RESP_07_test_01() {
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Game.currentPlayer.shields = 1;
         Game.currentPlayer.adjustShields(-2);
         assertEquals(0, Game.currentPlayer.shields);
@@ -270,7 +270,7 @@ class MainTest {
     @DisplayName("if a player has >12 cards, they are directed to trim hand sequence")
     void RESP_08_test_01() {
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         System.setOut(new PrintStream(outputStreamCaptor));
         Game.currentPlayer.hand.add(Game.main_deck.DrawAdventureCard());
         Game.currentPlayer.handSize++;
@@ -284,7 +284,7 @@ class MainTest {
     @DisplayName("if a player is in trim hand sequence, they correctly discard a card")
     void RESP_09_test_01() {
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Game.currentPlayer.hand.add(Game.main_deck.DrawAdventureCard());
         Game.currentPlayer.handSize++;
         String data = "1\n";
@@ -300,7 +300,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("1" + System.lineSeparator() + "2").getBytes());
         System.setIn(in);
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Game.currentPlayer.hand.add(Game.main_deck.DrawAdventureCard());
         Game.currentPlayer.handSize++;
         Game.currentPlayer.hand.add(Game.main_deck.DrawAdventureCard());
@@ -314,7 +314,7 @@ class MainTest {
     void RESP_11_test_01() {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         EventCard e = new EventCard("Q5","Q",10);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
@@ -330,7 +330,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         EventCard e = new EventCard("Q5","Q",5);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
@@ -346,7 +346,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         EventCard e = new EventCard("Q5","t",-1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
@@ -363,7 +363,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         AdventureCard a2 = new AdventureCard("D5","D",5);
@@ -385,7 +385,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         AdventureCard a2 = new AdventureCard("D5","D",5);
@@ -407,7 +407,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         AdventureCard a2 = new AdventureCard("D5","D",5);
@@ -429,7 +429,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         AdventureCard a2 = new AdventureCard("D5","D",5);
@@ -452,7 +452,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         sponsor.hand.set(0,a1);
@@ -473,7 +473,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         sponsor.hand.set(0,a1);
@@ -495,7 +495,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         AdventureCard a2 = new AdventureCard("D5","D",5);
@@ -517,7 +517,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         AdventureCard a2 = new AdventureCard("D5","D",5);
@@ -543,7 +543,7 @@ class MainTest {
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         AdventureCard a2 = new AdventureCard("D5","D",5);
@@ -567,7 +567,7 @@ class MainTest {
     void RESP_18_test_01() {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         Game.playStage(null,sponsor);
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Eligible Players:\np1\np2\np3");
@@ -581,7 +581,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() + "t" + System.lineSeparator() + "t").getBytes());
         System.setIn(in);
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(10);
         Player sponsor = Game.getPlayer(3);
         Quest q = new Quest(1);
         System.setOut(new PrintStream(outputStreamCaptor));
@@ -596,7 +596,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() + "t" + System.lineSeparator() + "w").getBytes());
         System.setIn(in);
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(10);
         Player sponsor = Game.getPlayer(3);
         Quest q = new Quest(1);
         Game.playStage(q,sponsor);
@@ -606,12 +606,12 @@ class MainTest {
     }
 
     @Test
-    @DisplayName("An eligible participant who chooses to participate draws 1 adventure card and possibly trims their hand (UC-03)\n")
+    @DisplayName("An eligible participant who chooses to participate draws 1 adventure card")
     void RESP_20_test_01() {
         ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() + "t" + System.lineSeparator() + "w").getBytes());
         System.setIn(in);
         Main Game = new Main();
-        Game.distributeHands();
+        Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         Player p1 = Game.getPlayer(0);
         Player p2 = Game.getPlayer(1);
@@ -626,8 +626,7 @@ class MainTest {
         assertEquals(12, p2.handSize);
         assertEquals(11, p3.handSize);
     }
-
-
+    
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {
