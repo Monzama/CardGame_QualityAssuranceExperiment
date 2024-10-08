@@ -253,9 +253,21 @@ class MainTest {
         //check the display
         assertEquals("The Next Event Card Is: Plague,\np1 loses 2 shields!\nEnd Of Turn:", outputStreamCaptor.toString().trim().replace("\r",""));
     }
-
+    //just to reset sysout
     @AfterEach
     void normalPrint(){
         System.setOut(standardOut);
+    }
+
+    @Test
+    @DisplayName("player gains or loses shields")
+    void RESP_07_test_01() {
+        Main Game = new Main();
+        Game.distributeHands();
+        Game.currentPlayer.shields = 1;
+        Game.currentPlayer.adjustShields(-2);
+        assertEquals(0, Game.currentPlayer.shields);
+        Game.currentPlayer.adjustShields(10);
+        assertEquals(10, Game.currentPlayer.shields);
     }
 }
