@@ -103,7 +103,7 @@ public class Main {
                 }
             }else if (Objects.equals(ans, "yes")){
                 //check if sponsor is valid
-                if (offer.canSponsor(questValue)){
+                if (offer.canSponsor(questValue, 0, null)){
                     sponsor = offer;
                     break;
                 }else{
@@ -126,7 +126,11 @@ public class Main {
                 Player s = setupStage((i+1), sponsor, q.previousStage);
                 q.addStage(s);
             }
+            display.clearScreen();
+            //by this point, the quest should be setup
+            playStage(q,sponsor);
         }
+
     }
     public Player setupStage(int round, Player sponsor, Player prev){
         Player stage_obj = new Player("Stage" + round, -1, display);
@@ -199,8 +203,9 @@ public class Main {
         return null;
     }
 
-    public void playStage(){
-
+    public void playStage(Quest q, Player sponsor){
+        //do stuff
+        //by this point, the quest should be setup
     }
 
     public void endTurn(){

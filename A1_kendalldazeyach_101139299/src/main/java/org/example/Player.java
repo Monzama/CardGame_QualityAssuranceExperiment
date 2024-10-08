@@ -78,25 +78,34 @@ public class Player {
     //note, this tells IF it is possible
     //a player can still make a mistake and not stage the quest properly
     //there will be a reset input added to redo staging
-    public boolean canSponsor(int stageCount) {
+    public boolean canSponsor(int stageCount, int prevvalue, Quest quest) {
         if (stageCount <=1){
             return true;
         }
+        sortHand();
+        ArrayList<AdventureCard> cards = new ArrayList<>(hand);
+        //allows us to call for mid quest stages.
+        //basically, before we continue, is the quest completable with the current stages setup and cards in hand
+        if (quest != null){
+            for (int i = 0; i < quest.stages.size(); i++) {
+                for (int j = 0; j < quest.stages.get(i).hand.size(); j++) {
+                    cards.remove(quest.stages.get(i).hand.get(j));
+                }
+            }
+        }
+
         //here we determine if the player has enough cards to sponsor
         if (stageCount > handSize) {
             return false;
         }
         //loop through hand, form the worst case scenario.
-        sortHand();
-        ArrayList<AdventureCard> cards = new ArrayList<>(hand);
         if (!Objects.equals(cards.get(stageCount - 1).type, "F")){
             return false;
         }
-        int prevVal = 0;
+        int prevVal = prevvalue;
         int val = 0;
         int indexsearch = 0;
         AdventureCard c;
-        AdventureCard prev;
         int s = 0;
         while (s < stageCount){
             if (cards.isEmpty()){

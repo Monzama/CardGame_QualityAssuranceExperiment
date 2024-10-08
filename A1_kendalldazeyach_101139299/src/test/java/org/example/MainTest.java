@@ -563,6 +563,20 @@ class MainTest {
         assertEquals(true, sponsor_hand);
     }
 
+    @Test
+    @DisplayName("The game displays the list of eligible players, in this case (p1,p2,p3)")
+    void RESP_18_test_01() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        Player sponsor = Game.getPlayer(3);
+        Quest q = new Quest(1);
+        Game.playStage(q,sponsor);
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Eligible Players:\np1\np2\np3");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
+
 
     //just to reset sysout
     @AfterEach
