@@ -488,6 +488,30 @@ class MainTest {
         assertEquals(true, sponsor_hand);
     }
 
+
+    @Test
+    @DisplayName("The sponsor has entered 'Quit' and the stage is empty, err message should appear")
+    void RESP_15_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" + System.lineSeparator()+ "Quit" + System.lineSeparator() + "1"+ System.lineSeparator() + "Quit").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        Player sponsor = Game.getPlayer(3);
+        AdventureCard a1 = new AdventureCard("F5","F",5);
+        AdventureCard a2 = new AdventureCard("D5","D",5);
+        sponsor.hand.set(0,a1);
+        sponsor.hand.set(1,a2);
+        Game.players.set(3,sponsor);
+        EventCard e = new EventCard("Q5","Q",1);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("A stage cannot be empty");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
+
+
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {
