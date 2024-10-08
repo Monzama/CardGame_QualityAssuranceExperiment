@@ -12,6 +12,7 @@ public class Main {
     Player currentPlayer;
     Display display;
     Boolean game_on;
+    EventCard current_event;
     public Main(){
         this.GenerateEventDeck();
         this.GenerateAdventureDeck();
@@ -38,7 +39,8 @@ public class Main {
     }
 
     public void nextEvent(){
-        //System.out.println("The Next Event Card Is: Q5");
+        current_event = DrawEventCard();
+        System.out.println("The Next Event Card Is: "+current_event.name);
     }
 
     public void endTurn(){
