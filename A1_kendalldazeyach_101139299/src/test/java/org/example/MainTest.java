@@ -215,11 +215,11 @@ class MainTest {
         EventCard e = new EventCard("Q5","Q", 5);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
-        assertEquals("The Next Event Card Is: Q5", outputStreamCaptor.toString().trim().replace("\r",""));
+        assertEquals("The Next Event Card Is: Q5,", outputStreamCaptor.toString().trim().replace("\r",""));
     }
 
     @Test
-    @DisplayName("The current player has drawn an E card, E- action is triggered")
+    @DisplayName("The current player has drawn the Plague card")
     void RESP_06_test_01() {
         System.setOut(new PrintStream(outputStreamCaptor));
         Main Game = new Main();
@@ -250,9 +250,8 @@ class MainTest {
         EventCard e = new EventCard("Plague","E",0);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
-        Game.endTurn();
         //check the display
-        assertEquals("The Next Event Card Is: Plague,\np1 loses 2 shields!\nEnd Of Turn:\nNo winners, game continues!", outputStreamCaptor.toString().trim().replace("\r",""));
+        assertEquals("The Next Event Card Is: Plague,\np1 loses 2 shields!\nEnd Of Turn:", outputStreamCaptor.toString().trim().replace("\r",""));
     }
 
     @AfterEach

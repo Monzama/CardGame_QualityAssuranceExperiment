@@ -38,19 +38,57 @@ public class Main {
 
     public void nextEvent(){
         current_event = DrawEventCard();
-        System.out.println("The Next Event Card Is: "+current_event.name);
+        System.out.println("The Next Event Card Is: "+current_event.name + ",");
+        switch (current_event.name){
+            case "Plague":
+                System.out.println(currentPlayer.name + " loses 2 shields!");
+                //process loss of shields
+                currentPlayer.adjustShields(-2);
+                endTurn();
+                break;
+            case "Queen's Favor":
+                //process 2 card draw
+                currentPlayer.addCardToHand(main_deck.DrawAdventureCard());
+                currentPlayer.addCardToHand(main_deck.DrawAdventureCard());
+                //process trim, should be done from player hand. would make sense to trigger on players turn
+                //to prevent peeking
+                endTurn();
+                break;
+            case "Prosperity":
+                Player p1 = players.get(0);
+                Player p2 = players.get(1);
+                Player p3 = players.get(2);
+                Player p4 = players.get(3);
+                p1.addCardToHand(main_deck.DrawAdventureCard());
+                p1.addCardToHand(main_deck.DrawAdventureCard());
+                p2.addCardToHand(main_deck.DrawAdventureCard());
+                p2.addCardToHand(main_deck.DrawAdventureCard());
+                p3.addCardToHand(main_deck.DrawAdventureCard());
+                p3.addCardToHand(main_deck.DrawAdventureCard());
+                p4.addCardToHand(main_deck.DrawAdventureCard());
+                p4.addCardToHand(main_deck.DrawAdventureCard());
+                players.set(0, p1);
+                players.set(1, p2);
+                players.set(2, p3);
+                players.set(3, p4);
+                endTurn();
+                break;
+
+        }
     }
 
     public void endTurn(){
         System.out.println("End Of Turn:");
+
+        //process return press request
+        //better to do through display
+
         //find winner
         ArrayList<Player> winners= new ArrayList<>(0);
         for (int i = 0; i < 4; i++) {
             if (players.get(i).getShields() >=7){winners.add(players.get(i));}
         }
-        if (winners.size() ==0){
-            System.out.println("No winners, game continues!");
-        } else if (winners.size() == 1) {
+        if (winners.size() == 1) {
             System.out.println("Game Over!\n" + winners.get(0).name + " Wins The Game!");
             this.game_on = false;
         } else if (winners.size() == 2) {

@@ -40,6 +40,12 @@ public class Player {
         return hand;
     }
 
+    public void adjustShields(int mod){
+        shields += mod;
+        if (shields < 0){shields = 0;}
+    }
+
+
     // Foes in increasing order, then weapons in increasing order, swords before horses.
     public void sortHand() {
         Collections.sort(hand);
