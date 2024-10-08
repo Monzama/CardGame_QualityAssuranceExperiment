@@ -37,6 +37,10 @@ public class Main {
             currentPlayer = players.get(currentPlayer.id+1);
     }
 
+    public void nextEvent(){
+        //System.out.println("The Next Event Card Is: Q5");
+    }
+
     public void endTurn(){
         System.out.println("End Of Turn:");
         //find winner

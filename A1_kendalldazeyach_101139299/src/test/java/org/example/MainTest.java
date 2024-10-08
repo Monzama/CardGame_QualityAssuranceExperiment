@@ -206,6 +206,18 @@ class MainTest {
         assertEquals(false,Game.game_on);
     }
 
+    @Test
+    @DisplayName("The Game indicates whose turn it is and displays their hand")
+    void RESP_05_test_01() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        EventCard e = new EventCard("Q5","Q", 5);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        assertEquals("The Next Event Card Is: Q5", outputStreamCaptor.toString().trim().replace("\r",""));
+    }
+
     @AfterEach
     void normalPrint(){
         System.setOut(standardOut);
