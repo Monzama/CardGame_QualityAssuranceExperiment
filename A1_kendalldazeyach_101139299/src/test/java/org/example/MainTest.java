@@ -466,6 +466,28 @@ class MainTest {
         assertEquals(true, sponsor_hand);
     }
 
+
+    @Test
+    @DisplayName("The sponsor has entered integer in range and card is valid")
+    void RESP_14_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "1"+System.lineSeparator() + "Quit").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands();
+        Player sponsor = Game.getPlayer(3);
+        AdventureCard a1 = new AdventureCard("F5","F",5);
+        sponsor.hand.set(0,a1);
+        Game.players.set(3,sponsor);
+        EventCard e = new EventCard("Q5","Q",1);
+        Game.main_deck.event_cards.set(0,e);
+        Game.nextEvent();
+        Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Stage:");
+        sponsor_hand=sponsor_hand && outputStreamCaptor.toString().trim().replace("\r","").contains("F5");
+        //check the display
+        assertEquals(true, sponsor_hand);
+    }
+
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {
