@@ -26,6 +26,7 @@ public class Player {
     public void addCardToHand(AdventureCard c) {
         hand.add(c);
         handSize++;
+        if (handSize > 12) {trimHand();}
     }
 
     public int getHandSize() {
@@ -46,6 +47,7 @@ public class Player {
     }
 
     private boolean trimHand(){
+        System.out.println(this.name + " please trim your hand:");
         return hand.size() > 0;
     }
 
