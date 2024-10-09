@@ -403,8 +403,16 @@ public class Main {
     public void waitForEnter(boolean test){
         if (test){
             endTurn();
-        }else {
-            return;
+        }else{
+            while (true) {
+                String response = display.getMessage("Press Enter to end your turn");
+                if (response.isEmpty()) {  // Checks if Enter was pressed without any other input
+                    endTurn();
+                    break;
+                } else {
+                    System.out.println("Please press Enter only to end your turn");
+                }
+            }
         }
     }
 
