@@ -693,7 +693,7 @@ class MainTest {
         eligible.add(p1);
         System.setOut(new PrintStream(outputStreamCaptor));
         Game.setupAttack(eligible,null);
-        assertEquals("Setup Attack:\np1\nHand:\n1: "+p1.hand.get(0).name + "\nSelect a card to add to the attack or 'Quit' if done",outputStreamCaptor.toString().trim().replace("\r",""));
+        assertEquals("Setup Attack:\np1\nHand:\n1: "+p1.hand.get(0).name,outputStreamCaptor.toString().trim().replace("\r",""));
     }
 
     @Test

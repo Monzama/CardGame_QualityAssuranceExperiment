@@ -247,17 +247,53 @@ public class Main {
 
     public void setupAttack(ArrayList<Player> eligblep, Player stage){
         //prompt for next card to include in attack
+        ArrayList<Player> attacks = new ArrayList<>(0);
         for (int i = 0; i <eligblep.size() ; i++) {
+            Player atk = new Player("A",-2,display);
            Player p = eligblep.get(i);
             System.out.println("Setup Attack:");
             System.out.println(p.name);
             display.displayHand(p);
-            System.out.println("Select a card to add to the attack or 'Quit' if done");
-            boolean b = true;
-            while (b && stage!=null) {
-                String response = display.getMessage("");
-                if (response.equals("1")){
-                    b=false;
+            while (true && stage!=null) {
+                String response = display.getMessage("Select a card to add to the attack or 'Quit' if done");
+                if (response.equals("Quit")){
+                    if (atk.handSize ==0){
+                        break;
+                    }else{
+                        attacks.add(atk);
+                        break;
+                    }
+                }else{
+                    int index = -1;
+                    try {
+                        index = Integer.parseInt(response) -1;
+                    }catch (NumberFormatException e){
+                        System.out.println("Invalid Input, must be an integer");
+                        continue;
+                    }
+                    if (index < 0 || index > p.hand.size()){
+                        System.out.println("Invalid Input, must be within size of hand");
+                        continue;
+                    } else if (p.hand.get(index).GetCardType().equals("F")) {
+                        System.out.println("Invalid Card, an attack cannot contain a foe");
+                        continue;
+                    } else{
+                        boolean flag = false;
+                        for (int j = 0; j < atk.hand.size(); j++) {
+                            if (atk.hand.get(j).GetCardName().equals(p.hand.get(index).GetCardName())) {
+                                System.out.println("Invalid Card, cannot have more than one weapon of the same type");
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (flag){
+                            System.out.println();
+                            continue;
+                        }
+                        atk.addCardToHand(p.hand.get(index));
+                        atk.shields = atk.shields + p.hand.get(index).GetCardValue();
+                        display.displayHand(atk);
+                    }
                 }
                 display.displayHand(p);
                 System.out.println("Select a card to add to the attack or 'Quit' if done");

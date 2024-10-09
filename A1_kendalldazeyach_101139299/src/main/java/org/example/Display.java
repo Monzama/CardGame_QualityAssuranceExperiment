@@ -26,7 +26,9 @@ public class Display {
         System.out.println("Current Player: " + p.getName());
     }
     public void displayHand(Player p){
-        if (p.id ==-1){
+        if (p.id ==-2){
+            System.out.println("Cards in attack:");
+        }else if (p.id ==-1){
             System.out.println("Stage:");
         }else{
             System.out.println("Hand:");
