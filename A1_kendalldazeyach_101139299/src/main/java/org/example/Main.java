@@ -249,7 +249,7 @@ public class Main {
         //prompt for next card to include in attack
         ArrayList<Player> attacks = new ArrayList<>(0);
         for (int i = 0; i <eligblep.size() ; i++) {
-            Player atk = new Player("A",-2,display);
+            Player atk = new Player(eligblep.get(i).name,-2,display);
            Player p = eligblep.get(i);
             System.out.println("Setup Attack:");
             System.out.println(p.name);
@@ -298,9 +298,33 @@ public class Main {
         }
         return playAttack(attacks, stage);
     }
-
+    //p1 Loses, attack: 5 stage: 10
+    //p1 fails the quest
     public ArrayList<Player> playAttack(ArrayList<Player> attacks, Player stage){
         //check if attacks win or lose
+        for (int i = 0; i < attacks.size(); i++) {
+            if (attacks.get(i).shields < stage.shields) {
+                //display loss
+                for (int j = 0; j < players.size(); j++) {
+                    Player p = players.get(j);
+                    if (Objects.equals(p.name, attacks.get(i).name)){
+                        System.out.println(p.name + " Loses, attack: " + attacks.get(i).shields + " stage: " + stage.shields);
+                        System.out.println(p.name + " fails the quest");
+                        break;
+                    }
+                }
+                attacks.get(i).shields = -1;
+            }else{
+                //display win
+                for (int j = 0; j < players.size(); j++) {
+                    Player p = players.get(j);
+                    if (Objects.equals(p.name, attacks.get(i).name)){
+                        System.out.println(p.name + "Wins, attack: " + attacks.get(i).shields + " stage: " + stage.shields);
+                        break;
+                    }
+                }
+            }
+        }
         //for attacks that lose,set shields to -1
         return attacks;
     }

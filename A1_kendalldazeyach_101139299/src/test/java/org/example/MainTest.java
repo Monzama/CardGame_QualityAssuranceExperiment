@@ -722,7 +722,7 @@ class MainTest {
         Player p1 = Game.getPlayer(0);
         ArrayList<Player> eligible = new ArrayList<>(0);
         Player stage = new Player("Stage 1", -1,Game.display);
-        Player atk = new Player("Stage 1", -1,Game.display);
+        Player atk = new Player("p1", -1,Game.display);
         atk.shields = 5;
         eligible.add(atk);
         stage.shields = 10;
