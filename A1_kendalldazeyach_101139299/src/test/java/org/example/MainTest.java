@@ -683,6 +683,18 @@ class MainTest {
         assertEquals((s+2),d);
     }
 
+    @Test
+    @DisplayName("The game displays the hand of the player and prompts for next card or quit")
+    void RESP_23_test_01() {
+        Main Game = new Main();
+        Game.distributeHands(1);
+        Player p1 = Game.getPlayer(0);
+        ArrayList<Player> eligible = new ArrayList<>(0);
+        eligible.add(p1);
+        Game.setupAttack(eligible,null);
+        assertEquals("Setup Attack:\np1\nHand:\n1: "+p1.hand.get(0).name + "\nSelect a card to add to the attack or 'Quit' if done:",outputStreamCaptor.toString().trim().replace("\r",""));
+    }
+
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {

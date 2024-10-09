@@ -234,10 +234,17 @@ public class Main {
             for (int i = 0; i < eligblep.size(); i++){
                 eligblep.get(i);
                 eligblep.get(i).addCardToHand(main_deck.DrawAdventureCard());
+
             }
         }else{
             endQuest(q, sponsor);
         }
+    }
+
+    public void setupAttack(ArrayList<Player> eligblep, Player stage){
+        //display hand of player
+        //prompt for next card to include in attack
+
     }
 
     public void endQuest(Quest q, Player sponsor){
