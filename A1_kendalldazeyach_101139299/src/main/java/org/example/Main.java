@@ -253,10 +253,17 @@ public class Main {
             System.out.println(p.name);
             display.displayHand(p);
             System.out.println("Select a card to add to the attack or 'Quit' if done");
-            if (stage==null){return;}
-            String response = display.getMessage("");
-        }
+            boolean b = true;
+            while (b && stage!=null) {
+                String response = display.getMessage("");
+                if (response.equals("1")){
+                    b=false;
+                }
+                display.displayHand(p);
+                System.out.println("Select a card to add to the attack or 'Quit' if done");
+            }
 
+        }
     }
 
     public void endQuest(Quest q, Player sponsor){

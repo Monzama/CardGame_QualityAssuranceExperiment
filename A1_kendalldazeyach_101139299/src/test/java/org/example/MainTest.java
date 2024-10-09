@@ -696,6 +696,23 @@ class MainTest {
         assertEquals("Setup Attack:\np1\nHand:\n1: "+p1.hand.get(0).name + "\nSelect a card to add to the attack or 'Quit' if done",outputStreamCaptor.toString().trim().replace("\r",""));
     }
 
+    @Test
+    @DisplayName("The game displays the hand of the player and prompts for next card or quit")
+    void RESP_24_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + System.lineSeparator() + "2" + System.lineSeparator() + "Quit").getBytes());
+        System.setIn(in);
+        Main Game = new Main();
+        Game.distributeHands(10);
+        Player p1 = Game.getPlayer(0);
+        ArrayList<Player> eligible = new ArrayList<>(0);
+        p1.hand.set(0, new AdventureCard("D5", "D", 5));
+        p1.hand.set(1, new AdventureCard("L20", "L", 20));
+        eligible.add(p1);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Game.setupAttack(eligible,new Player("Stage 1",-1,Game.display));
+        Boolean attack_display = outputStreamCaptor.toString().trim().replace("\r","").contains("Cards in attack:\n1: D5\n2: L20");
+        assertEquals(true, attack_display);
+    }
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {
