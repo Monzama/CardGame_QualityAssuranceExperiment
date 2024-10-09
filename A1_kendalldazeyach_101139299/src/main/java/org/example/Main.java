@@ -362,6 +362,19 @@ public class Main {
                 }
             }
         }
+        //remove cards
+        for (Player attack : attacks) {
+            for (int j = 0; j < players.size(); j++) {
+                for (int k = 0; k < attack.hand.size(); k++) {
+                    for (int i = 0; i < players.get(j).hand.size(); i++) {
+                        if (players.get(j).hand.get(i).name.equals(attack.hand.get(k).name)) {
+                            players.get(j).trimHand(i+1);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         //for attacks that lose,set shields to -1
         return attacks;
     }
