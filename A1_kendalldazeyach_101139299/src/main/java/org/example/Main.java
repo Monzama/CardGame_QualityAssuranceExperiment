@@ -245,7 +245,7 @@ public class Main {
         }
     }
 
-    public void setupAttack(ArrayList<Player> eligblep, Player stage){
+    public ArrayList<Player> setupAttack(ArrayList<Player> eligblep, Player stage){
         //prompt for next card to include in attack
         ArrayList<Player> attacks = new ArrayList<>(0);
         for (int i = 0; i <eligblep.size() ; i++) {
@@ -257,12 +257,8 @@ public class Main {
             while (true && stage!=null) {
                 String response = display.getMessage("Select a card to add to the attack or 'Quit' if done");
                 if (response.equals("Quit")){
-                    if (atk.handSize ==0){
-                        break;
-                    }else{
                         attacks.add(atk);
                         break;
-                    }
                 }else{
                     int index = -1;
                     try {
@@ -300,7 +296,15 @@ public class Main {
             }
 
         }
+        return playAttack(attacks, stage);
     }
+
+    public ArrayList<Player> playAttack(ArrayList<Player> attacks, Player stage){
+        //check if attacks win or lose
+        //for attacks that lose,set shields to -1
+        return attacks;
+    }
+
 
     public void endQuest(Quest q, Player sponsor){
         System.out.println("Quest Finished!");

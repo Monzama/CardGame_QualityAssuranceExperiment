@@ -684,7 +684,7 @@ class MainTest {
     }
 
     @Test
-    @DisplayName("The game displays the hand of the player and prompts for next card or quit")
+    @DisplayName("The game displays the hand of the player and prompts the participant for the position of the next card to include in the attack or ‘quit’ (to end building this attack)\n")
     void RESP_23_test_01() {
         Main Game = new Main();
         Game.distributeHands(1);
@@ -697,7 +697,7 @@ class MainTest {
     }
 
     @Test
-    @DisplayName("The game displays the hand of the player and prompts for next card or quit")
+    @DisplayName("The selected card is included in the attack, which is displayed, ‘Quit’ is entered, in which case the cards (if any) used for this attack are displayed\n")
     void RESP_24_test_01() {
         ByteArrayInputStream in = new ByteArrayInputStream(("1" + System.lineSeparator() + "2" + System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
@@ -711,6 +711,24 @@ class MainTest {
         System.setOut(new PrintStream(outputStreamCaptor));
         Game.setupAttack(eligible,new Player("Stage 1",-1,Game.display));
         Boolean attack_display = outputStreamCaptor.toString().trim().replace("\r","").contains("Cards in attack:\n1: D5\n2: L20");
+        assertEquals(true, attack_display);
+    }
+
+    @Test
+    @DisplayName("participants with an attack less than the value of the current stage lose and become ineligible to further participate in this quest.\n")
+    void RESP_25_test_01() {
+        Main Game = new Main();
+        Game.distributeHands(10);
+        Player p1 = Game.getPlayer(0);
+        ArrayList<Player> eligible = new ArrayList<>(0);
+        Player stage = new Player("Stage 1", -1,Game.display);
+        Player atk = new Player("Stage 1", -1,Game.display);
+        atk.shields = 5;
+        eligible.add(atk);
+        stage.shields = 10;
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Game.playAttack(eligible,stage);
+        Boolean attack_display = outputStreamCaptor.toString().trim().replace("\r","").contains("p1 Loses, attack: 5 stage: 10\np1 fails the quest");
         assertEquals(true, attack_display);
     }
     //just to reset sysout
