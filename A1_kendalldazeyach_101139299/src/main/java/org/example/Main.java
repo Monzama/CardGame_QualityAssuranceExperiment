@@ -234,16 +234,28 @@ public class Main {
             for (int i = 0; i < eligblep.size(); i++){
                 eligblep.get(i);
                 eligblep.get(i).addCardToHand(main_deck.DrawAdventureCard());
-
             }
+//            for (int i = 0; i < q.stages.size(); i++){
+//                Player s = q.stages.get(i);
+//                setupAttack(eligblep,s);
+//            }
+
         }else{
             endQuest(q, sponsor);
         }
     }
 
     public void setupAttack(ArrayList<Player> eligblep, Player stage){
-        //display hand of player
         //prompt for next card to include in attack
+        for (int i = 0; i <eligblep.size() ; i++) {
+           Player p = eligblep.get(i);
+            System.out.println("Setup Attack:");
+            System.out.println(p.name);
+            display.displayHand(p);
+            System.out.println("Select a card to add to the attack or 'Quit' if done");
+            if (stage==null){return;}
+            String response = display.getMessage("");
+        }
 
     }
 
