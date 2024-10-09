@@ -400,9 +400,16 @@ public class Main {
         }
     }
 
+    public void waitForEnter(boolean test){
+        if (test){
+            endTurn();
+        }else {
+            return;
+        }
+    }
 
     public void endTurn(){
-        System.out.println("End Of Turn:");
+        System.out.println("End Of Turn!");
 
         //process return press request
         //better to do through display
@@ -425,6 +432,7 @@ public class Main {
             System.out.println("Game Over!\nEveryone Wins?!?");
             this.game_on = false;
         }
+        display.clearScreen();
     }
 
     public void distributeHands(int count){

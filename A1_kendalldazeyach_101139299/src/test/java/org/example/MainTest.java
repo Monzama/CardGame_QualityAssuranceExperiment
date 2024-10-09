@@ -184,8 +184,8 @@ class MainTest {
         ps.add(p3);
         ps.add(p4);
         Game.players = ps;
-        Game.endTurn();//check to see if game over
-        assertEquals("End Of Turn:\nGame Over!\np1 & p2 Win The Game!", outputStreamCaptor.toString().trim().replace("\r",""));
+        Game.waitForEnter(true);//check to see if game over
+        assertEquals("End Of Turn!\nGame Over!\np1 & p2 Win The Game!", outputStreamCaptor.toString().trim().replace("\r",""));
         outputStreamCaptor.reset();
         //one winner
         Game = new Main();
@@ -200,8 +200,8 @@ class MainTest {
         ps.add(p3);
         ps.add(p4);
         Game.players = ps;
-        Game.endTurn();
-        assertEquals("End Of Turn:\nGame Over!\np4 Wins The Game!", outputStreamCaptor.toString().trim().replace("\r",""));
+        Game.waitForEnter(true);
+        assertEquals("End Of Turn!\nGame Over!\np4 Wins The Game!", outputStreamCaptor.toString().trim().replace("\r",""));
         assertEquals(false,Game.game_on);
     }
 
@@ -251,7 +251,7 @@ class MainTest {
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
         //check the display
-        assertEquals("The Next Event Card Is: Plague,\np1 loses 2 shields!\nEnd Of Turn:", outputStreamCaptor.toString().trim().replace("\r",""));
+        assertEquals("The Next Event Card Is: Plague,\np1 loses 2 shields!\nEnd Of Turn!", outputStreamCaptor.toString().trim().replace("\r",""));
     }
 
     @Test
@@ -793,7 +793,17 @@ class MainTest {
         assertEquals(true, test);
     }
 
-
+    @Test
+    @DisplayName("The game indicates the turn of the current player has ended and clears the ‘hotseat’ display once that player presses the <return> key")
+    void RESP_28_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("\n\r").getBytes());
+        System.setIn(in);
+        System.setOut(new PrintStream(outputStreamCaptor));
+        Main Game = new Main();
+        Game.distributeHands(12);
+        Game.waitForEnter(false);
+        assertEquals("Press Enter to end your turn:End Of Turn!", outputStreamCaptor.toString().trim().replace("\r",""));
+    }
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {
