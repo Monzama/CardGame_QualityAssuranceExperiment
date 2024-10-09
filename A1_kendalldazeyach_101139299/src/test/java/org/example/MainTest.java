@@ -758,6 +758,41 @@ class MainTest {
         assertEquals(2,p1.shields);
     }
 
+    @Test
+    @DisplayName("All participants of the current stage have all the cards they used for their attack of the current stage discarded by the game.")
+    void RESP_27_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() + "w" + System.lineSeparator() + "w" + System.lineSeparator()+ "8" + System.lineSeparator()+ "Quit").getBytes());
+        System.setIn(in);
+        Main Game = new Main();
+        Game.distributeHands(8);
+        Player sponsor = Game.getPlayer(3);
+        Quest q = new Quest(1);
+        Player s1 = new Player("Stage 1", -1,Game.display);
+        s1.addCardToHand(new AdventureCard("F5", "F", 5));
+        s1.shields =5;
+        q.addStage(s1);
+        Player p1 = Game.getPlayer(0);
+        p1.hand.set(7, new AdventureCard("E35", "E", 350));
+        Player p2 = new Player("p2", -1,Game.display);
+        p2.hand.addAll(p1.hand);
+        Game.playStage(q,sponsor);
+        String diff;
+        List<String> difference = new ArrayList<>();
+        for (AdventureCard c : p1.hand) {
+            if (!p2.hand.contains(c)) {
+                difference.add(c.name);
+            }
+        }
+        for (AdventureCard c : p2.hand) {
+            if (!p1.hand.contains(c)) {
+                difference.add(c.name);
+            }
+        }
+        diff = String.join(", ", difference);
+        boolean test = diff.contains("E35");
+        assertEquals(true, test);
+    }
+
 
     //just to reset sysout
     @AfterEach
