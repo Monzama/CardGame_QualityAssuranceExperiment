@@ -235,13 +235,47 @@ public class Main {
                 eligblep.get(i);
                 eligblep.get(i).addCardToHand(main_deck.DrawAdventureCard());
             }
-//            for (int i = 0; i < q.stages.size(); i++){
-//                Player s = q.stages.get(i);
-//                setupAttack(eligblep,s);
-//            }
+            for (int i = 0; i < q.stages.size(); i++){
+                Player s = q.stages.get(i);
+                ArrayList<Player> results = setupAttack(eligblep,s);
+                for (int j = 0; j < results.size(); j++) {
+                    Player r = results.get(j);
+                    if (r.shields == -1){
+                        for (int k = 0; k < players.size(); k++) {
+                            Player p = players.get(j);
+                            if (Objects.equals(p.name, r.name)){
+                                eligblep.remove(r);
+                            }
+                        }
+                    }
+
+                }
+                if (eligblep.size()==0){
+                    //everyone loses. except the sponsor i think
+                    System.out.println(sponsor.name + " Completes the sponsorship and earns " + q.stageCount + " shields!");
+                    endQuest(q,sponsor);
+                    return;
+                }
+                if (s == q.stages.getLast()){
+                    for (int j = 0; j < results.size(); j++) {
+                        Player r = results.get(j);
+                            for (int k = 0; k < players.size(); k++) {
+                                Player p = players.get(j);
+                                if (Objects.equals(p.name, r.name)){
+                                    System.out.println(p.name + " Completes the quest and earns " + q.stageCount + " shields!");
+                                    p.adjustShields(q.stageCount);
+                                }
+                            }
+                    }
+                    endQuest(q,sponsor);
+                    return;
+                }
+            }
 
         }else{
-            endQuest(q, sponsor);
+            //noone played. sponsor wins
+            System.out.println(sponsor.name + " Completes the sponsorship and earns " + q.stageCount + " shields!");
+            endQuest(q,sponsor);
         }
     }
 
@@ -249,6 +283,7 @@ public class Main {
         //prompt for next card to include in attack
         ArrayList<Player> attacks = new ArrayList<>(0);
         for (int i = 0; i <eligblep.size() ; i++) {
+            display.clearScreen();
             Player atk = new Player(eligblep.get(i).name,-2,display);
            Player p = eligblep.get(i);
             System.out.println("Setup Attack:");
@@ -308,6 +343,7 @@ public class Main {
                 for (int j = 0; j < players.size(); j++) {
                     Player p = players.get(j);
                     if (Objects.equals(p.name, attacks.get(i).name)){
+                        System.out.println();
                         System.out.println(p.name + " Loses, attack: " + attacks.get(i).shields + " stage: " + stage.shields);
                         System.out.println(p.name + " fails the quest");
                         break;
@@ -319,7 +355,8 @@ public class Main {
                 for (int j = 0; j < players.size(); j++) {
                     Player p = players.get(j);
                     if (Objects.equals(p.name, attacks.get(i).name)){
-                        System.out.println(p.name + "Wins, attack: " + attacks.get(i).shields + " stage: " + stage.shields);
+                        System.out.println();
+                        System.out.println(p.name + " Wins, attack: " + attacks.get(i).shields + " stage: " + stage.shields);
                         break;
                     }
                 }
