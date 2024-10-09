@@ -731,6 +731,34 @@ class MainTest {
         Boolean attack_display = outputStreamCaptor.toString().trim().replace("\r","").contains("p1 Loses, attack: 5 stage: 10\np1 fails the quest");
         assertEquals(true, attack_display);
     }
+
+    @Test
+    @DisplayName("participants with an attack equal or greater to the value of the current stage are eligible for the next stage (if any). If this is the last stage, they are winners of this quest and earn as many shields as there are stages to this quest\n")
+    void RESP_26_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() + "w" + System.lineSeparator() + "w" + System.lineSeparator()+ "1" + System.lineSeparator()+ "Quit" + System.lineSeparator()+ "1" + System.lineSeparator()+ "Quit" + System.lineSeparator()).getBytes());
+        System.setIn(in);
+        Main Game = new Main();
+        Game.distributeHands(8);
+        Player sponsor = Game.getPlayer(3);
+        Quest q = new Quest(2);
+        Player s1 = new Player("Stage 1", -1,Game.display);
+        s1.addCardToHand(new AdventureCard("F5", "F", 5));
+        s1.shields =5;
+        sponsor.addCardToHand(new AdventureCard("F5", "F", 5));
+        Player s2 = new Player("Stage 2", -1,Game.display);
+        s2.addCardToHand(new AdventureCard("F10", "F", 5));
+        s2.shields = 10;
+        sponsor.addCardToHand(new AdventureCard("F10", "F", 5));
+        q.addStage(s1);
+        q.addStage(s2);
+        Player p1 = Game.getPlayer(0);
+        p1.hand.set(0, new AdventureCard("E30", "E", 30));
+        p1.hand.set(1, new AdventureCard("S10", "S", 10));
+        Game.playStage(q,sponsor);
+        assertEquals(2,p1.shields);
+    }
+
+
     //just to reset sysout
     @AfterEach
     void normalPrint() throws IOException {
