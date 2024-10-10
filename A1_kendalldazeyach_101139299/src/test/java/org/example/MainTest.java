@@ -812,6 +812,7 @@ class MainTest {
     void A_TEST_JP_Scenario(){
         System.setOut(standardOut);
         System.out.flush();
+        //setup mock input based on scenario
         ByteArrayInputStream in = new ByteArrayInputStream(("" +System.lineSeparator() + "no" +System.lineSeparator() + "yes" +System.lineSeparator() +"1" +System.lineSeparator()
         +"8" +System.lineSeparator()+"Quit" +System.lineSeparator()+"3" +System.lineSeparator()+"7" + System.lineSeparator() +"Quit" + System.lineSeparator()+"4" +System.lineSeparator()+"6" +System.lineSeparator()+"11" +System.lineSeparator() +
                 "Quit" +System.lineSeparator() + "5" + System.lineSeparator() +"10"+System.lineSeparator() + "Quit" +System.lineSeparator()+ "t" +System.lineSeparator()+ "1" +System.lineSeparator()+ "" +System.lineSeparator() +
@@ -831,6 +832,7 @@ class MainTest {
         System.setIn(in);
         Main Game = new Main(true,false);
         Game.distributeHands(12);
+        //fix p1 hand
         Player p1 = new Player("p1",0, Game.display);
         p1.addCardToHand(new AdventureCard("F5","F",5));
         p1.addCardToHand(new AdventureCard("F5","F",5));
@@ -847,6 +849,7 @@ class MainTest {
         p1.sortHand();
         Game.players.set(0,p1);
         Game.currentPlayer =p1;
+        //fix p2 hand
         Player p2 = new Player("p2",1, Game.display);
         p2.addCardToHand(new AdventureCard("F5","F",5));
         p2.addCardToHand(new AdventureCard("F5","F",5));
@@ -862,6 +865,7 @@ class MainTest {
         p2.addCardToHand(new AdventureCard("E30","E",30));
         p2.sortHand();
         Game.players.set(1,p2);
+        //fix p3 hand
         Player p3 = new Player("p3",2, Game.display);
         p3.addCardToHand(new AdventureCard("F5","F",5));
         p3.addCardToHand(new AdventureCard("F5","F",5));
@@ -877,6 +881,7 @@ class MainTest {
         p3.addCardToHand(new AdventureCard("L20","L",20));
         p3.sortHand();
         Game.players.set(2,p3);
+        //fix p4 hand
         Player p4 = new Player("p4",3, Game.display);
         p4.addCardToHand(new AdventureCard("F5","F",5));
         p4.addCardToHand(new AdventureCard("F15","F",15));
@@ -893,6 +898,7 @@ class MainTest {
         p4.sortHand();
         Game.players.set(3,p4);
         Game.game_on = true;
+        //rig the deck
         Game.main_deck.event_cards.set(0,new EventCard("Q4", "Q", 4));
         Game.main_deck.adventure_cards.set(0,new AdventureCard("F30", "F", 30));
         Game.main_deck.adventure_cards.set(1,new AdventureCard("S10", "S", 10));
@@ -904,7 +910,7 @@ class MainTest {
         Game.main_deck.adventure_cards.set(7,new AdventureCard("S10", "S", 10));
         Game.main_deck.adventure_cards.set(8,new AdventureCard("F30", "F", 30));
         Game.main_deck.adventure_cards.set(9,new AdventureCard("L20", "L", 20));
-
+        //run the game
         Game.begin(Game);
 
         //all the asserts here
