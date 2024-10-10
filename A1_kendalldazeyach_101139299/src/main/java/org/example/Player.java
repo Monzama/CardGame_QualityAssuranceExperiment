@@ -28,7 +28,10 @@ public class Player {
     public void addCardToHand(AdventureCard c) {
         hand.add(c);
         handSize++;
-        if (handSize > 12) {trimHand(-2);}
+        if (handSize > 12) {
+            trimHand(-2);
+            display.clearScreen(true);
+        }
     }
 
     public int getHandSize() {
@@ -55,7 +58,6 @@ public class Player {
         if (index ==-2){
             int n = hand.size() -12;
             for (int i=0;i<n;i++) {
-                display.clearScreen();
                 sortHand();
                 System.out.println(this.name + " please trim your hand:");
                 display.displayHand(this);
@@ -111,6 +113,7 @@ public class Player {
             if (cards.isEmpty()){
                 return false;
             }else {
+                if (cards.size() <= indexsearch){return false;}
                 c = cards.get(indexsearch);
                 if (val > prevVal) {
                     prevVal = val;
@@ -121,8 +124,8 @@ public class Player {
                     val +=c.value;
                 } else if (Objects.equals(c.type, "F") && val !=0) {
                     if (cards.size() > indexsearch){
-                        indexsearch++;
                         c = cards.get(indexsearch);
+                        indexsearch++;
                     }else{
                         return false;
                     }
@@ -139,23 +142,23 @@ public class Player {
                         if (c.value + cards.get(indexsearch+1).value >= cards.get(indexsearch+2).value) {
                             if (cards.get(indexsearch+2).value + val > prevVal) {
                                 prevVal = (c.value+val+cards.get(indexsearch+2).value);
+                                cards.remove(indexsearch+2);
                                 cards.remove(c);
-                                c = cards.remove(indexsearch+2);
                                 val = 0;
                                 indexsearch = 0;
                                 s++;
                             } else if (c.value + cards.get(indexsearch+1).value > prevVal) {
                                 prevVal = (c.value + val + cards.get(indexsearch + 1).value);
+                                cards.remove(indexsearch + 1);
                                 cards.remove(c);
-                                c = cards.remove(indexsearch + 1);
                                 val = 0;
                                 indexsearch = 0;
                                 s++;
                             }else if (c.value + cards.get(indexsearch+1).value + cards.get(indexsearch+2).value > prevVal) {
                                 prevVal = (c.value+val + cards.get(indexsearch+2).value + cards.get(indexsearch+1).value);
+                                cards.remove(indexsearch+2);
+                                cards.remove(indexsearch+1);
                                 cards.remove(c);
-                                c = cards.remove(indexsearch+1);
-                                c = cards.remove(indexsearch+2);
                                 val = 0;
                                 indexsearch = 0;
                                 s++;
@@ -165,37 +168,36 @@ public class Player {
                         }else {
                             if (c.value + cards.get(indexsearch+1).value > prevVal) {
                                 prevVal = (c.value+val+ cards.get(indexsearch+1).value);
+                                cards.remove(indexsearch+1);
                                 cards.remove(c);
-                                c = cards.remove(indexsearch+1);
                                 val = 0;
                                 indexsearch = 0;
                                 s++;
                             }else if (cards.get(indexsearch+2).value + val > prevVal) {
                                 prevVal = (c.value+val+cards.get(indexsearch+2).value);
-                                cards.remove(c);
-                                c = cards.remove(indexsearch+2);
+                                cards.remove(indexsearch+2);
                                 val = 0;
                                 indexsearch = 0;
                                 s++;
                             } else if (c.value + cards.get(indexsearch+2).value> prevVal) {
                                 prevVal = (c.value+val + cards.get(indexsearch+2).value + cards.get(indexsearch+1).value);
+                                cards.remove(indexsearch+2);
                                 cards.remove(c);
-                                c = cards.remove(indexsearch+1);
-                                c = cards.remove(indexsearch+2);
                                 val = 0;
                                 indexsearch = 0;
                                 s++;
                             } else if (cards.get(indexsearch+1).value + cards.get(indexsearch+2).value> prevVal) {
                                 prevVal = (val + cards.get(indexsearch + 2).value + cards.get(indexsearch + 1).value);
-                                c = cards.remove(indexsearch + 1);
-                                c = cards.remove(indexsearch + 2);
+                                cards.remove(indexsearch + 2);
+                                cards.remove(indexsearch + 1);
                                 val = 0;
                                 indexsearch = 0;
                                 s++;
                             }else if (c.value + cards.get(indexsearch+1).value + cards.get(indexsearch+2).value > prevVal) {
                                 prevVal = (val + cards.get(indexsearch + 2).value + cards.get(indexsearch + 1).value);
-                                c = cards.remove(indexsearch + 1);
-                                c = cards.remove(indexsearch + 2);
+                                cards.remove(indexsearch + 2);
+                                cards.remove(indexsearch + 1);
+                                cards.remove(c);
                                 val = 0;
                                 indexsearch = 0;
                                 s++;

@@ -12,35 +12,48 @@ public class Main {
     Display display;
     Boolean game_on;
     EventCard current_event;
-    public Main(){
+    ArrayList<Integer> QuestBoard;
+    public Main(boolean test) {
         display = new Display();
         this.GenerateEventDeck();
         this.GenerateAdventureDeck();
         main_deck.shuffle();
-        game_on = true;
+        game_on = !test;
+        QuestBoard = new ArrayList<>(0);
     }
     public static void main(String[] args) {
-        Main main = new Main();
+        Main main = new Main(false);
         main.distributeHands(12);
-        while(main.game_on == true){
-            //do the game
+        //do the game
+        System.out.print("p1 Starting ");
+        main.currentPlayer.sortHand();
+        main.display.displayHand(main.currentPlayer);
+        System.out.println("Begin the game?");
+        main.nextEvent();//once this begins, the game should loop until over
+
+        while (main.game_on) {
             main.nextTurn();
-            main.currentPlayer.addCardToHand(main.main_deck.DrawAdventureCard());
-            //main.currentPlayer.trimHand();
         }
     }
 
-    public void nextTurn (){
+    public void nextTurn () {
+        if (currentPlayer.id == 3) {
+            currentPlayer = players.get(0);
+        } else{
+            currentPlayer = players.get(currentPlayer.id + 1);
+        }
         display.displayTurn(currentPlayer);
         currentPlayer.sortHand();
         display.displayHand(currentPlayer);
-        if (currentPlayer.id == 3){
-            currentPlayer = players.get(0);
-        }else
-            currentPlayer = players.get(currentPlayer.id+1);
+        if (game_on) {
+            nextEvent();
+        }
     }
 
     public void nextEvent(){
+        if (game_on) {
+            display.clearScreen(true);
+        }
         current_event = DrawEventCard();
         System.out.println("The Next Event Card Is: "+current_event.name + ",");
         switch (current_event.name){
@@ -48,16 +61,26 @@ public class Main {
                 System.out.println(currentPlayer.name + " loses 2 shields!");
                 //process loss of shields
                 currentPlayer.adjustShields(-2);
-                endTurn();
-                break;
+                if (game_on) {
+                    waitForEnter(false);
+                    return;
+                }else{
+                    waitForEnter(true);
+                    return;
+                }
             case "Queen's Favor":
                 //process 2 card draw
                 currentPlayer.addCardToHand(main_deck.DrawAdventureCard());
                 currentPlayer.addCardToHand(main_deck.DrawAdventureCard());
                 //process trim, should be done from player hand. would make sense to trigger on players turn
                 //to prevent peeking
-                endTurn();
-                break;
+                if (game_on) {
+                    waitForEnter(false);
+                    return;
+                }else{
+                    waitForEnter(true);
+                    return;
+                }
             case "Prosperity":
                 Player p1 = players.get(0);
                 Player p2 = players.get(1);
@@ -71,46 +94,74 @@ public class Main {
                 p3.addCardToHand(main_deck.DrawAdventureCard());
                 p4.addCardToHand(main_deck.DrawAdventureCard());
                 p4.addCardToHand(main_deck.DrawAdventureCard());
+                p1.sortHand();
+                p2.sortHand();
+                p3.sortHand();
+                p4.sortHand();
                 players.set(0, p1);
                 players.set(1, p2);
                 players.set(2, p3);
                 players.set(3, p4);
-                endTurn();
-                break;
+                currentPlayer = players.get(0);
+                if (game_on) {
+                    waitForEnter(false);
+                    return;
+                }else{
+                    waitForEnter(true);
+                    return;
+                }
 
         }
         if (!Objects.equals(current_event.GetCardType(), "E")){
             initiateQuest(current_event.GetCardValue());
+            waitForEnter(true);
+            return;
+        }
+        if (!game_on) {
+            waitForEnter(false);
         }
     }
 
     public void initiateQuest(int questValue){
         Player sponsor = null;
+        int offset = currentPlayer.id;
+        int end = currentPlayer.id-1;
         Player offer = currentPlayer;
         if (questValue == 10){
             System.out.println(offer.name+ " Would you like to sponsor this quest?:");
             return;
         }
         while (true){
+            if (!offer.canSponsor(questValue, 0, null) && questValue !=-1){
+                System.out.println(offer.name + " Cannot sponsor with the current hand");
+                if (offer.id == 3){
+                    break;
+                }
+                offer = players.get(offer.id+1);
+                continue;
+            }
             String ans = display.getMessage(offer.name+ " Would you like to sponsor this quest?");
             if (Objects.equals(ans, "no")){
-                if (offer.id == 3){
-                    System.out.println("No Sponsorship, Quest Abandoned");
-                    endTurn();
-                    break;
+                if (offer.id == 3 || offset ==-1){
+                    if (offset>0){
+                        offer = players.get(0);
+                        offset = -1;
+                    } else if (offer.id == end && offset ==-1) {
+                        System.out.println("No Sponsorship, Quest Abandoned");
+                        waitForEnter(false);
+                        return;
+                    }else if (offset == 0){
+                        System.out.println("No Sponsorship, Quest Abandoned");
+                        waitForEnter(false);
+                        return;
+                    }
                 }else{
                     offer = players.get(offer.id+1);
                 }
             }else if (Objects.equals(ans, "yes")){
                 //check if sponsor is valid
-                if (offer.canSponsor(questValue, 0, null)){
-                    sponsor = offer;
-                    break;
-                }else{
-                    System.out.println(offer.name + "Cannot sponsor with the current hand");
-                    offer = players.get(offer.id+1);
-                }
-
+                sponsor = offer;
+                break;
             }else {
                 System.out.println("Invalid Input");
             }
@@ -119,22 +170,28 @@ public class Main {
             System.out.println(sponsor.name+ " Sponsors The Quest!");
             System.out.println("Setup Stage 1");
             display.displayHand(sponsor);
+            ArrayList<Integer> index_added= new ArrayList<>(0);
             //do the quest setup
             Quest q = new Quest(questValue);
             for (int i = 0; i < questValue; i++) {
+                if (i!=0){
+                    System.out.println("Setup Stage " + (i+1));
+                    display.displayHand(sponsor);
+                    System.out.println("Cannot use " + this.QuestBoard.toString());
+                }
                 //do something
-                Player s = setupStage((i+1), sponsor, q.previousStage);
+                Player s = setupStage((i+1), sponsor, q.previousStage, index_added);
                 q.addStage(s);
             }
             if (!Objects.equals(current_event.type, "t")){
-                display.clearScreen();
+                display.clearScreen(false);
                 //by this point, the quest should be setup
                 playStage(q,sponsor);
             }
         }
 
     }
-    public Player setupStage(int round, Player sponsor, Player prev){
+    public Player setupStage(int round, Player sponsor, Player prev, ArrayList<Integer> index_added){
         Player stage_obj = new Player("Stage" + round, -1, display);
         int value = 0;
         while (true){
@@ -151,7 +208,7 @@ public class Main {
                             //stage ready to play
                             stage_obj.sortHand();
                             stage_obj.shields = value;
-                            System.out.println("Setup Finished");
+                            System.out.println("Setup Finished!");
                             display.displayHand(stage_obj);
                             return stage_obj;
                         }
@@ -159,21 +216,23 @@ public class Main {
                         //stage ready to play
                         stage_obj.sortHand();
                         stage_obj.shields = value;
-                        System.out.println("Setup Finished");
+                        System.out.println("Setup Finished!");
                         display.displayHand(stage_obj);
                         return stage_obj;
                     }
                 }
-            }else{
+            }else {
                 int index = -1;
                 try {
                     index = Integer.parseInt(response);
-                }catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
                     System.out.println("Invalid Input, must be an integer");
                     break;
                 }
-                if (index < 0 || index >= sponsor.handSize){
+                if (index < 0 || index > sponsor.handSize) {
                     System.out.println("Invalid Input, must be within size of hand");
+                } else if (this.QuestBoard.contains(index)) {
+                    System.out.println("Invalid Input, cannot use duplicate card");
                 }else{
                     AdventureCard card = sponsor.hand.get(index-1);
                     if (stage_obj.hand.contains(card) && !Objects.equals(card.GetCardType(), "F")){
@@ -183,8 +242,9 @@ public class Main {
                             System.out.println("Invalid Card, a stage cannot have more than one foe");
                         }else{
                             System.out.println("Card Valid");
-                            stage_obj.hand.add(card);
-                            value = card.GetCardValue();
+                            this.QuestBoard.add(index);
+                            stage_obj.addCardToHand(card);
+                            value += card.GetCardValue();
                             stage_obj.sortHand();
                             display.displayHand(stage_obj);
                         }
@@ -193,8 +253,9 @@ public class Main {
                         System.out.println("Invalid Card, a stage cannot have a weapon and no foe");
                     }else{
                         System.out.println("Card Valid");
-                        stage_obj.hand.add(card);
-                        value = card.GetCardValue();
+                        this.QuestBoard.add(index);
+                        stage_obj.addCardToHand(card);
+                        value += card.GetCardValue();
                         stage_obj.sortHand();
                         display.displayHand(stage_obj);
                     }
@@ -205,9 +266,10 @@ public class Main {
         return null;
     }
 
-    public void playStage(Quest q, Player sponsor){
+    public ArrayList<Player> playStage(Quest q, Player sponsor){
         //do stuff
-        ArrayList<Player> eligblep = players;
+        ArrayList<Player> eligblep = new ArrayList<>(0);
+        eligblep.addAll(players);
         eligblep.remove(sponsor);
         String playerlist = "Eligible Players:";
         for (int i = 0; i < eligblep.size(); i++){
@@ -215,7 +277,7 @@ public class Main {
         }
         System.out.println(playerlist);
         if (q ==null){
-            return;
+            return eligblep;
         }
         //prompt players here
         for (int i = 0; i < eligblep.size(); i++){
@@ -231,7 +293,9 @@ public class Main {
         }
         //should only be the participants here
         if (eligblep.size()>0){
+            System.out.println("The eligible players draw a card each:");
             for (int i = 0; i < eligblep.size(); i++){
+                System.out.println(eligblep.get(i).name + " Draws a card");
                 eligblep.get(i);
                 eligblep.get(i).addCardToHand(main_deck.DrawAdventureCard());
             }
@@ -242,9 +306,10 @@ public class Main {
                     Player r = results.get(j);
                     if (r.shields == -1){
                         for (int k = 0; k < players.size(); k++) {
-                            Player p = players.get(j);
+                            Player p = players.get(k);
                             if (Objects.equals(p.name, r.name)){
-                                eligblep.remove(r);
+                                p.adjustShields(-1);
+                                eligblep.remove(p);
                             }
                         }
                     }
@@ -254,13 +319,13 @@ public class Main {
                     //everyone loses. except the sponsor i think
                     System.out.println(sponsor.name + " Completes the sponsorship and earns " + q.stageCount + " shields!");
                     endQuest(q,sponsor);
-                    return;
+                    return eligblep;
                 }
                 if (s == q.stages.getLast()){
                     for (int j = 0; j < results.size(); j++) {
                         Player r = results.get(j);
                             for (int k = 0; k < players.size(); k++) {
-                                Player p = players.get(j);
+                                Player p = players.get(k);
                                 if (Objects.equals(p.name, r.name)){
                                     System.out.println(p.name + " Completes the quest and earns " + q.stageCount + " shields!");
                                     p.adjustShields(q.stageCount);
@@ -268,7 +333,7 @@ public class Main {
                             }
                     }
                     endQuest(q,sponsor);
-                    return;
+                    return eligblep;
                 }
             }
 
@@ -277,15 +342,17 @@ public class Main {
             System.out.println(sponsor.name + " Completes the sponsorship and earns " + q.stageCount + " shields!");
             endQuest(q,sponsor);
         }
+        return eligblep;
     }
 
     public ArrayList<Player> setupAttack(ArrayList<Player> eligblep, Player stage){
         //prompt for next card to include in attack
         ArrayList<Player> attacks = new ArrayList<>(0);
         for (int i = 0; i <eligblep.size() ; i++) {
-            display.clearScreen();
+            display.clearScreen(false);
             Player atk = new Player(eligblep.get(i).name,-2,display);
            Player p = eligblep.get(i);
+            display.displayHand(stage);
             System.out.println("Setup Attack:");
             System.out.println(p.name);
             display.displayHand(p);
@@ -327,7 +394,6 @@ public class Main {
                     }
                 }
                 display.displayHand(p);
-                System.out.println("Select a card to add to the attack or 'Quit' if done");
             }
 
         }
@@ -375,6 +441,9 @@ public class Main {
                 }
             }
         }
+        if (game_on){
+            display.clearScreen(true);
+        }
         //for attacks that lose,set shields to -1
         return attacks;
     }
@@ -382,37 +451,35 @@ public class Main {
 
     public void endQuest(Quest q, Player sponsor){
         System.out.println("Quest Finished!");
+        this.QuestBoard.clear();
         if (q == null){
             sponsor.trimHand(2);
             sponsor.trimHand(2);
             return;
         }
-        int counter = 0;
+        int counter = q.stageCount;
         for (int i = 0; i < q.stageCount; i++) {
-            for (int j = 0; j < q.stages.get(i).handSize; j++) {
+            for (int j = 0; j < q.stages.get(i).hand.size(); j++) {
                 counter++;
                 sponsor.hand.remove(q.stages.get(i).hand.get(j));
                 sponsor.handSize--;
             }
         }
-        for (int i = 0; i < (counter+ q.stageCount); i++) {
-            sponsor.addCardToHand(main_deck.DrawAdventureCard());
+        for (int l = 0; l < (counter-1); l++) {
+            sponsor.hand.add(main_deck.DrawAdventureCard());
+            sponsor.handSize++;
         }
+        sponsor.addCardToHand(main_deck.DrawAdventureCard());
     }
 
-    public void waitForEnter(boolean test){
+    public boolean waitForEnter(boolean test){
         if (test){
             endTurn();
+            return true;
         }else{
-            while (true) {
-                String response = display.getMessage("Press Enter to end your turn");
-                if (response.isEmpty()) {  // Checks if Enter was pressed without any other input
-                    endTurn();
-                    break;
-                } else {
-                    System.out.println("Please press Enter only to end your turn");
-                }
-            }
+            display.getMessage("Press Enter to end your turn:");
+            endTurn();
+            return true;
         }
     }
 
@@ -440,7 +507,6 @@ public class Main {
             System.out.println("Game Over!\nEveryone Wins?!?");
             this.game_on = false;
         }
-        display.clearScreen();
     }
 
     public void distributeHands(int count){

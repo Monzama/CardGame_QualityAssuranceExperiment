@@ -5,16 +5,23 @@ import java.util.Scanner;
 
 public class Display {
     Scanner sc = new Scanner(System.in);
-    public void clearScreen (){
+    public void clear(){
         for (int i = 0; i < 100; i++) {
             System.out.println();
         }
     }
 
-
+    public void clearScreen(boolean Wait){
+        if (!Wait){
+            clear();
+        }else{
+            getMessage("Press Enter to continue");
+            clear();
+        }
+    }
     public String getMessage(String message){
-        String m = "";
-        System.out.print(message+":");
+        String m = null;
+        System.out.print(message);
         if (sc.hasNextLine()){
             m = sc.nextLine();
         }
@@ -22,14 +29,15 @@ public class Display {
     }
 
     public void displayTurn(Player p){
-        clearScreen();
+        clearScreen(false);
         System.out.println("Current Player: " + p.getName());
     }
     public void displayHand(Player p){
+        if (p == null){return;}
         if (p.id ==-2){
-            System.out.println("Cards in attack:");
+            System.out.println("Cards in attack: attack value: " + p.shields);
         }else if (p.id ==-1){
-            System.out.println("Stage:");
+            System.out.println("Stage: Value: " + p.shields);
         }else{
             System.out.println("Hand:");
         }
