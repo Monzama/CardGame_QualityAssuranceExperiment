@@ -11,6 +11,7 @@ public class Main {
     Player currentPlayer;
     Display display;
     Boolean game_on;
+    Boolean loop;
     EventCard current_event;
     ArrayList<Integer> QuestBoard;
     public Main(boolean test) {
@@ -19,21 +20,36 @@ public class Main {
         this.GenerateAdventureDeck();
         main_deck.shuffle();
         game_on = !test;
+        loop = true;
         QuestBoard = new ArrayList<>(0);
     }
+
+    public Main(boolean test, boolean loop) {
+        display = new Display();
+        this.GenerateEventDeck();
+        this.GenerateAdventureDeck();
+        main_deck.shuffle();
+        game_on = !test;
+        loop = loop;
+        QuestBoard = new ArrayList<>(0);
+    }
+
     public static void main(String[] args) {
         Main main = new Main(false);
         main.distributeHands(12);
         //do the game
+        main.begin(main);
+        while (main.game_on &&main.loop) {
+            main.nextTurn();
+        }
+    }
+
+    public void begin(Main main) {
         System.out.print("p1 Starting ");
         main.currentPlayer.sortHand();
         main.display.displayHand(main.currentPlayer);
         System.out.println("Begin the game?");
-        main.nextEvent();//once this begins, the game should loop until over
-
-        while (main.game_on) {
-            main.nextTurn();
-        }
+        main.nextEvent();
     }
 
     public void nextTurn () {
@@ -168,7 +184,8 @@ public class Main {
         }
         if (sponsor != null){
             System.out.println(sponsor.name+ " Sponsors The Quest!");
-            System.out.println("Setup Stage 1");
+            display.clearScreen(false);
+            System.out.println( sponsor.name + " Setup Stage 1");
             display.displayHand(sponsor);
             ArrayList<Integer> index_added= new ArrayList<>(0);
             //do the quest setup
@@ -180,7 +197,7 @@ public class Main {
                     System.out.println("Cannot use " + this.QuestBoard.toString());
                 }
                 //do something
-                Player s = setupStage((i+1), sponsor, q.previousStage, index_added);
+                Player s = setupStage((i+1), sponsor, q.previousStage);
                 q.addStage(s);
             }
             if (!Objects.equals(current_event.type, "t")){
@@ -191,9 +208,8 @@ public class Main {
         }
 
     }
-    public Player setupStage(int round, Player sponsor, Player prev, ArrayList<Integer> index_added){
+    public Player setupStage(int round, Player sponsor, Player prev){
         Player stage_obj = new Player("Stage" + round, -1, display);
-        int value = 0;
         while (true){
             String response = display.getMessage(sponsor.name + " Select a card to add to the stage or 'Quit' if done:");
             if (Objects.equals(response, "Quit")){
@@ -202,12 +218,11 @@ public class Main {
                     System.out.println("A stage cannot be empty");
                 }else{
                     if (prev !=null){
-                        if (prev.shields >= value){
+                        if (prev.shields >= stage_obj.shields ){
                             System.out.println("A stage cannot be less than the previous");
                         }else{
                             //stage ready to play
                             stage_obj.sortHand();
-                            stage_obj.shields = value;
                             System.out.println("Setup Finished!");
                             display.displayHand(stage_obj);
                             return stage_obj;
@@ -215,7 +230,6 @@ public class Main {
                     }else{
                         //stage ready to play
                         stage_obj.sortHand();
-                        stage_obj.shields = value;
                         System.out.println("Setup Finished!");
                         display.displayHand(stage_obj);
                         return stage_obj;
@@ -227,7 +241,7 @@ public class Main {
                     index = Integer.parseInt(response);
                 } catch (NumberFormatException e) {
                     System.out.println("Invalid Input, must be an integer");
-                    break;
+                    continue;
                 }
                 if (index < 0 || index > sponsor.handSize) {
                     System.out.println("Invalid Input, must be within size of hand");
@@ -244,7 +258,7 @@ public class Main {
                             System.out.println("Card Valid");
                             this.QuestBoard.add(index);
                             stage_obj.addCardToHand(card);
-                            value += card.GetCardValue();
+                            stage_obj.shields += card.GetCardValue();
                             stage_obj.sortHand();
                             display.displayHand(stage_obj);
                         }
@@ -255,7 +269,7 @@ public class Main {
                         System.out.println("Card Valid");
                         this.QuestBoard.add(index);
                         stage_obj.addCardToHand(card);
-                        value += card.GetCardValue();
+                        stage_obj.shields  += card.GetCardValue();
                         stage_obj.sortHand();
                         display.displayHand(stage_obj);
                     }
@@ -263,7 +277,6 @@ public class Main {
 
             }
         }
-        return null;
     }
 
     public ArrayList<Player> playStage(Quest q, Player sponsor){
@@ -275,31 +288,48 @@ public class Main {
         for (int i = 0; i < eligblep.size(); i++){
             playerlist+= "\n"+eligblep.get(i).name;
         }
-        System.out.println(playerlist);
         if (q ==null){
+            System.out.println(playerlist);
             return eligblep;
         }
-        //prompt players here
-        for (int i = 0; i < eligblep.size(); i++){
-            String response = display.getMessage(eligblep.get(i).name+" Withdraw (w) or Tackle (t)?");
-            if (Objects.equals(response, "w")){
-                eligblep.remove(i);
-                i--;
-            }else if (!Objects.equals(response, "t")){
-                i--;
-                System.out.println("Incorrect response");
-            }
-            System.out.println();
-        }
         //should only be the participants here
-        if (eligblep.size()>0){
-            System.out.println("The eligible players draw a card each:");
-            for (int i = 0; i < eligblep.size(); i++){
-                System.out.println(eligblep.get(i).name + " Draws a card");
-                eligblep.get(i);
-                eligblep.get(i).addCardToHand(main_deck.DrawAdventureCard());
-            }
             for (int i = 0; i < q.stages.size(); i++){
+                    String playerlist2 = "Eligible Players:";
+                    for (int k = 0; k < eligblep.size(); k++) {
+                        playerlist2 += "\n" + eligblep.get(k).name;
+                    }
+                    System.out.println(playerlist2);
+                    //prompt players here
+                    for (int o = 0; o < eligblep.size(); o++){
+                        String response = display.getMessage(eligblep.get(o).name+" Withdraw (w) or Tackle (t)?");
+                        if (Objects.equals(response, "w")){
+                            eligblep.remove(o);
+                            o--;
+                        }else if (!Objects.equals(response, "t")){
+                            o--;
+                            System.out.println("Incorrect response");
+                            continue;
+                        }else{
+                            AdventureCard draw = main_deck.DrawAdventureCard();
+                            System.out.println(eligblep.get(o).name + " Draws a " + draw.GetCardName());
+                            if (eligblep.get(o).handSize ==12){
+                                eligblep.get(o).addCardToHand(draw);
+                            }else {
+                                eligblep.get(o).addCardToHand(draw);
+                                display.clearScreen(true);
+                            }
+                        }
+                    }
+                    if (q.stageCount <=0){
+                        return eligblep;
+                    }
+                if (eligblep.size()==0){
+                    //everyone loses. except the sponsor i think
+                    System.out.println("Quest Failed!");
+                    endQuest(q,sponsor);
+                    return eligblep;
+                }
+                //remove player from eligible list
                 Player s = q.stages.get(i);
                 ArrayList<Player> results = setupAttack(eligblep,s);
                 for (int j = 0; j < results.size(); j++) {
@@ -308,22 +338,20 @@ public class Main {
                         for (int k = 0; k < players.size(); k++) {
                             Player p = players.get(k);
                             if (Objects.equals(p.name, r.name)){
-                                p.adjustShields(-1);
                                 eligblep.remove(p);
                             }
                         }
                     }
-
                 }
                 if (eligblep.size()==0){
                     //everyone loses. except the sponsor i think
-                    System.out.println(sponsor.name + " Completes the sponsorship and earns " + q.stageCount + " shields!");
+                    System.out.println("Quest Failed!");
                     endQuest(q,sponsor);
                     return eligblep;
                 }
                 if (s == q.stages.getLast()){
-                    for (int j = 0; j < results.size(); j++) {
-                        Player r = results.get(j);
+                    for (int j = 0; j < eligblep.size(); j++) {
+                        Player r = eligblep.get(j);
                             for (int k = 0; k < players.size(); k++) {
                                 Player p = players.get(k);
                                 if (Objects.equals(p.name, r.name)){
@@ -336,14 +364,8 @@ public class Main {
                     return eligblep;
                 }
             }
-
-        }else{
-            //noone played. sponsor wins
-            System.out.println(sponsor.name + " Completes the sponsorship and earns " + q.stageCount + " shields!");
-            endQuest(q,sponsor);
-        }
         return eligblep;
-    }
+        }
 
     public ArrayList<Player> setupAttack(ArrayList<Player> eligblep, Player stage){
         //prompt for next card to include in attack
@@ -352,11 +374,11 @@ public class Main {
             display.clearScreen(false);
             Player atk = new Player(eligblep.get(i).name,-2,display);
            Player p = eligblep.get(i);
-            display.displayHand(stage);
+            //display.displayHand(stage);
             System.out.println("Setup Attack:");
             System.out.println(p.name);
             display.displayHand(p);
-            while (true && stage!=null) {
+            while (attacks.size() < eligblep.size() && stage!=null) {
                 String response = display.getMessage("Select a card to add to the attack or 'Quit' if done");
                 if (response.equals("Quit")){
                         attacks.add(atk);
@@ -367,26 +389,21 @@ public class Main {
                         index = Integer.parseInt(response) -1;
                     }catch (NumberFormatException e){
                         System.out.println("Invalid Input, must be an integer");
-                        continue;
                     }
                     if (index < 0 || index > p.hand.size()){
                         System.out.println("Invalid Input, must be within size of hand");
-                        continue;
                     } else if (p.hand.get(index).GetCardType().equals("F")) {
                         System.out.println("Invalid Card, an attack cannot contain a foe");
-                        continue;
                     } else{
                         boolean flag = false;
                         for (int j = 0; j < atk.hand.size(); j++) {
                             if (atk.hand.get(j).GetCardName().equals(p.hand.get(index).GetCardName())) {
                                 System.out.println("Invalid Card, cannot have more than one weapon of the same type");
                                 flag = true;
-                                break;
                             }
                         }
                         if (flag){
                             System.out.println();
-                            continue;
                         }
                         atk.addCardToHand(p.hand.get(index));
                         atk.shields = atk.shields + p.hand.get(index).GetCardValue();
@@ -397,6 +414,7 @@ public class Main {
             }
 
         }
+        display.clearScreen(false);
         return playAttack(attacks, stage);
     }
     //p1 Loses, attack: 5 stage: 10
@@ -410,7 +428,7 @@ public class Main {
                     Player p = players.get(j);
                     if (Objects.equals(p.name, attacks.get(i).name)){
                         System.out.println();
-                        System.out.println(p.name + " Loses, attack: " + attacks.get(i).shields + " stage: " + stage.shields);
+                        System.out.println(p.name + " Loses, attack: " + attacks.get(i).shields);
                         System.out.println(p.name + " fails the quest");
                         break;
                     }
@@ -422,7 +440,7 @@ public class Main {
                     Player p = players.get(j);
                     if (Objects.equals(p.name, attacks.get(i).name)){
                         System.out.println();
-                        System.out.println(p.name + " Wins, attack: " + attacks.get(i).shields + " stage: " + stage.shields);
+                        System.out.println(p.name + " Wins, attack: " + attacks.get(i).shields);
                         break;
                     }
                 }
@@ -431,18 +449,19 @@ public class Main {
         //remove cards
         for (Player attack : attacks) {
             for (int j = 0; j < players.size(); j++) {
-                for (int k = 0; k < attack.hand.size(); k++) {
-                    for (int i = 0; i < players.get(j).hand.size(); i++) {
-                        if (players.get(j).hand.get(i).name.equals(attack.hand.get(k).name)) {
-                            players.get(j).trimHand(i+1);
-                            break;
+                if (players.get(j).name == attack.name) {
+                    while (attack.hand.size() > 0) {
+                        for (int i = 0; i < players.get(j).hand.size(); i++) {
+                            if (players.get(j).hand.get(i).name.equals(attack.hand.get(0).name)) {
+                                players.get(j).hand.remove(i);
+                                players.get(j).handSize--;
+                                attack.hand.remove(0);
+                                break;
+                            }
                         }
                     }
                 }
             }
-        }
-        if (game_on){
-            display.clearScreen(true);
         }
         //for attacks that lose,set shields to -1
         return attacks;

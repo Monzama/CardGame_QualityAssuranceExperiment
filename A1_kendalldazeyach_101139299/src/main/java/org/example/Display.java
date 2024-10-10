@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Display {
+    Main m;
     Scanner sc = new Scanner(System.in);
     public void clear(){
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 50; i++) {
             System.out.println();
         }
     }
@@ -39,6 +40,7 @@ public class Display {
         }else if (p.id ==-1){
             System.out.println("Stage: Value: " + p.shields);
         }else{
+            p.sortHand();
             System.out.println("Hand:");
         }
         ArrayList<AdventureCard> hand = p.getHand();

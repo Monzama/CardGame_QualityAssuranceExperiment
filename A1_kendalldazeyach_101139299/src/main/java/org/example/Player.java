@@ -31,6 +31,7 @@ public class Player {
         if (handSize > 12) {
             trimHand(-2);
             display.clearScreen(true);
+            sortHand();
         }
     }
 
@@ -216,7 +217,7 @@ public class Player {
 
     // Foes in increasing order, then weapons in increasing order, swords before horses.
     public void sortHand() {
-        Collections.sort(hand);
+        Collections.sort(this.hand);
     }
 }
 
