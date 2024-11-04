@@ -18,6 +18,18 @@ public class Quest {
         stages.add(s);
         stageCount++;
     }
+    //stores current and increments by one, if at last stage, return null
+    public Player nextStage() {
+        if (currentStage.id == stageCount){
+            return null;
+        }
+        return stages.get(currentStage.id);
+    }
+    //setts previous stage to null and current stage to stage 1 or get(0)
+    //this allows us to rack what stage using the quest class.
+    public Player setupPlay() {
+
+    }
 
 
 

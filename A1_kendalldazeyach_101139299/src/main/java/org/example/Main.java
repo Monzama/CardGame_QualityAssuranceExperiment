@@ -1,9 +1,7 @@
 package org.example;
 
 import java.io.InputStream;
-import java.io.PipedInputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Objects;
 
 public class Main {
@@ -316,93 +314,96 @@ public class Main {
         }
     }
     //break this off to a decide players and play stage.
-    public ArrayList<Player> playStage(Quest q, Player sponsor){
-        //do stuff
-        ArrayList<Player> eligblep = new ArrayList<>(0);
-        eligblep.addAll(players);
-        eligblep.remove(sponsor);
+    public ArrayList<Player> decidePlayers (Quest q, ArrayList<Player> eligble){
+        if (eligble == null){
+            eligble = new ArrayList<>(0);
+            eligble.addAll(players);
+            eligble.remove(sponsor);
+        }
         String playerlist = "Eligible Players:";
-        for (int i = 0; i < eligblep.size(); i++){
-            playerlist+= "\n"+eligblep.get(i).name;
+        for (int i = 0; i < eligble.size(); i++){
+            playerlist+= "\n"+eligble.get(i).name;
         }
+        //print our who can join stage
+        System.out.println(playerlist);
         if (q ==null){
-            System.out.println(playerlist);
-            return eligblep;
+            return eligble;
         }
-        //should only be the participants here
-            for (int i = 0; i < q.stages.size(); i++){
-                    String playerlist2 = "Eligible Players:";
-                    for (int k = 0; k < eligblep.size(); k++) {
-                        playerlist2 += "\n" + eligblep.get(k).name;
-                    }
-                    System.out.println(playerlist2);
-                    //prompt players here
-                    for (int o = 0; o < eligblep.size(); o++){
-                        String response = display.getMessage(eligblep.get(o).name+" Withdraw (w) or Tackle (t)?");
-                        if (Objects.equals(response, "w")){
-                            eligblep.remove(o);
-                            o--;
-                        }else if (!Objects.equals(response, "t")){
-                            o--;
-                            System.out.println("Incorrect response");
-                            continue;
-                        }else{
-                            AdventureCard draw = main_deck.DrawAdventureCard();
-                            System.out.println(eligblep.get(o).name + " Draws a " + draw.GetCardName());
-                            if (eligblep.get(o).handSize ==12){
-                                eligblep.get(o).addCardToHand(draw);
-                            }else {
-                                eligblep.get(o).addCardToHand(draw);
-                                display.clearScreen(false);
-                            }
-                        }
-                    }
-                    if (q.stageCount <=0){
-                        return eligblep;
-                    }
-                if (eligblep.size()==0){
-                    //everyone loses. except the sponsor i think
-                    System.out.println("Quest Failed!");
-                    endQuest(q,sponsor);
-                    return eligblep;
-                }
-                //remove player from eligible list
-                Player s = q.stages.get(i);
-                ArrayList<Player> results = setupAttack(eligblep,s);
-                for (int j = 0; j < results.size(); j++) {
-                    Player r = results.get(j);
-                    if (r.shields == -1){
-                        for (int k = 0; k < players.size(); k++) {
-                            Player p = players.get(k);
-                            if (Objects.equals(p.name, r.name)){
-                                eligblep.remove(p);
-                            }
-                        }
-                    }
-                }
-                if (eligblep.size()==0){
-                    //everyone loses. except the sponsor i think
-                    System.out.println("Quest Failed!");
-                    endQuest(q,sponsor);
-                    return eligblep;
-                }
-                if (s == q.stages.getLast()){
-                    for (int j = 0; j < eligblep.size(); j++) {
-                        Player r = eligblep.get(j);
-                            for (int k = 0; k < players.size(); k++) {
-                                Player p = players.get(k);
-                                if (Objects.equals(p.name, r.name)){
-                                    System.out.println(p.name + " Completes the quest and earns " + q.stageCount + " shields!");
-                                    p.adjustShields(q.stageCount);
-                                }
-                            }
-                    }
-                    endQuest(q,sponsor);
-                    return eligblep;
+        //prompt players here
+        for (int o = 0; o < eligble.size(); o++){
+            String response = display.getMessage(eligble.get(o).name+" Withdraw (w) or Tackle (t)?");
+            if (Objects.equals(response, "w")){
+                eligble.remove(o);
+                o--;
+            }else if (!Objects.equals(response, "t")){
+                o--;
+                System.out.println("Incorrect response");
+            }else{
+                AdventureCard draw = main_deck.DrawAdventureCard();
+                System.out.println(eligble.get(o).name + " Draws a " + draw.GetCardName());
+                if (eligble.get(o).handSize ==12){
+                    eligble.get(o).addCardToHand(draw);
+                }else {
+                    eligble.get(o).addCardToHand(draw);
+                    display.clearScreen(false);
                 }
             }
-        return eligblep;
         }
+        if (game_on){
+            playStage(q,sponsor,eligble, q.previousStage);
+        }
+        return eligble;
+    }
+
+
+    public ArrayList<Player> playStage(Quest q, Player sponsor, ArrayList<Player> eligblep, Player cur_stage){
+        //should only be the participants here
+        //play one stage and call decide players if gameon
+        if (q.stageCount <=0){
+            return eligblep;
+        }
+        if (eligblep.size()==0){
+            //everyone loses. except the sponsor i think
+            System.out.println("Quest Failed!");
+            endQuest(q,sponsor);
+            return eligblep;
+        }
+        //remove player from eligible list
+        Player s = q.stages.get();
+        ArrayList<Player> results = setupAttack(eligblep,s);
+        for (int j = 0; j < results.size(); j++) {
+            Player r = results.get(j);
+            if (r.shields == -1){
+                for (int k = 0; k < players.size(); k++) {
+                    Player p = players.get(k);
+                    if (Objects.equals(p.name, r.name)){
+                        eligblep.remove(p);
+                    }
+                }
+            }
+        }
+        if (eligblep.size()==0){
+            //everyone loses. except the sponsor i think
+            System.out.println("Quest Failed!");
+            endQuest(q,sponsor);
+            return eligblep;
+        }
+        if (s == q.stages.getLast()){
+            for (int j = 0; j < eligblep.size(); j++) {
+                Player r = eligblep.get(j);
+                for (int k = 0; k < players.size(); k++) {
+                    Player p = players.get(k);
+                    if (Objects.equals(p.name, r.name)){
+                        System.out.println(p.name + " Completes the quest and earns " + q.stageCount + " shields!");
+                        p.adjustShields(q.stageCount);
+                    }
+                }
+            }
+            endQuest(q,sponsor);
+            return eligblep;
+        }
+        return eligblep;
+    }
 
     public ArrayList<Player> setupAttack(ArrayList<Player> eligblep, Player stage){
         //prompt for next card to include in attack
