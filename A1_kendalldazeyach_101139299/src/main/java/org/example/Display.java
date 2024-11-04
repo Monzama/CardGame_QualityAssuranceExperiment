@@ -1,15 +1,26 @@
 package org.example;
 
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Display {
     Main m;
-    Scanner sc = new Scanner(System.in);
+    Scanner sc;
     public void clear(){
         for (int i = 0; i < 50; i++) {
             System.out.println();
         }
+    }
+    public Display(){
+        this.m = m;
+        sc = new Scanner(System.in);
+    }
+    public Display(InputStream pipedIn){
+        this.m = m;
+        sc = new Scanner(pipedIn);
     }
 
     public void clearScreen(boolean Wait){

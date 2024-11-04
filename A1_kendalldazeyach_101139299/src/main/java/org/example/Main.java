@@ -1,19 +1,26 @@
 package org.example;
 
+import java.io.InputStream;
+import java.io.PipedInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
 
 public class Main {
     //setup game variables
-    Deck main_deck= new Deck();
-    ArrayList<Player> players = new ArrayList<Player>(0);
-    Player currentPlayer;
-    Display display;
-    Boolean game_on;
-    Boolean loop;
-    EventCard current_event;
-    ArrayList<Integer> QuestBoard;
+    public Deck main_deck= new Deck();
+    public ArrayList<Player> players = new ArrayList<Player>(0);
+    public Player currentPlayer;
+    public Display display;
+    public Boolean game_on;
+    public Boolean loop;
+    public EventCard current_event;
+    public ArrayList<Integer> QuestBoard;
+    Quest current_q;
+    Player sponsor;
+
+
+
     public Main(boolean test) {
         display = new Display();
         this.GenerateEventDeck();
@@ -21,11 +28,23 @@ public class Main {
         main_deck.shuffle();
         game_on = !test;
         loop = true;
+        sponsor = null;
+
         QuestBoard = new ArrayList<>(0);
     }
 
     public Main(boolean test, boolean loop) {
         display = new Display();
+        this.GenerateEventDeck();
+        this.GenerateAdventureDeck();
+        main_deck.shuffle();
+        game_on = !test;
+        sponsor = null;
+        loop = loop;
+        QuestBoard = new ArrayList<>(0);
+    }
+    public Main(boolean test, boolean loop, InputStream pipedIn) {
+        display = new Display(pipedIn);
         this.GenerateEventDeck();
         this.GenerateAdventureDeck();
         main_deck.shuffle();
@@ -41,6 +60,9 @@ public class Main {
         main.begin(main);
         while (main.game_on &&main.loop) {
             main.nextTurn();
+            if (main.sponsor != null){
+                main.playStage(main.current_q, main.sponsor);
+            }
         }
     }
 
@@ -68,7 +90,7 @@ public class Main {
 
     public void nextEvent(){
         if (game_on) {
-            display.clearScreen(true);
+            display.clearScreen(false);
         }
         current_event = DrawEventCard();
         System.out.println("The Next Event Card Is: "+current_event.name + ",");
@@ -126,11 +148,12 @@ public class Main {
                     waitForEnter(true);
                     return;
                 }
-
         }
-        if (!Objects.equals(current_event.GetCardType(), "E")){
+        if (!Objects.equals(current_event.GetCardType(), "E") && game_on){
             initiateQuest(current_event.GetCardValue());
             waitForEnter(true);
+            return;
+        }else if (!Objects.equals(current_event.GetCardType(), "E")){
             return;
         }
         if (!game_on) {
@@ -177,6 +200,7 @@ public class Main {
             }else if (Objects.equals(ans, "yes")){
                 //check if sponsor is valid
                 sponsor = offer;
+                this.sponsor = sponsor;
                 break;
             }else {
                 System.out.println("Invalid Input");
@@ -185,29 +209,42 @@ public class Main {
         if (sponsor != null){
             System.out.println(sponsor.name+ " Sponsors The Quest!");
             display.clearScreen(false);
-            System.out.println( sponsor.name + " Setup Stage 1");
-            display.displayHand(sponsor);
-            ArrayList<Integer> index_added= new ArrayList<>(0);
-            //do the quest setup
-            Quest q = new Quest(questValue);
-            for (int i = 0; i < questValue; i++) {
-                if (i!=0){
-                    System.out.println("Setup Stage " + (i+1));
-                    display.displayHand(sponsor);
-                    System.out.println("Cannot use " + this.QuestBoard.toString());
-                }
-                //do something
-                Player s = setupStage((i+1), sponsor, q.previousStage);
-                q.addStage(s);
-            }
-            if (!Objects.equals(current_event.type, "t")){
-                display.clearScreen(false);
-                //by this point, the quest should be setup
-                playStage(q,sponsor);
+
+            if (game_on){
+                initializeStage(sponsor,questValue);
             }
         }
 
     }
+
+
+    public void initializeStage (Player sponsor, int questValue){
+        System.out.println( sponsor.name + " Setup Stage 1");
+        display.displayHand(sponsor);
+        ArrayList<Integer> index_added= new ArrayList<>(0);
+        //do the quest setup
+        Quest q = new Quest(questValue);
+        for (int i = 0; i < questValue; i++) {
+            if (i!=0){
+                System.out.println("Setup Stage " + (i+1));
+                display.displayHand(sponsor);
+                System.out.println("Cannot use " + this.QuestBoard.toString());
+            }
+            //do something
+            Player s = setupStage((i+1), sponsor, q.previousStage);
+            q.addStage(s);
+        }
+        if (!Objects.equals(current_event.type, "t")){
+            display.clearScreen(false);
+            //by this point, the quest should be setup
+            current_q = q;
+            this.sponsor = sponsor;
+            System.out.println("Quest has been setup!");
+        }
+    }
+
+
+
     public Player setupStage(int round, Player sponsor, Player prev){
         Player stage_obj = new Player("Stage" + round, -1, display);
         while (true){
@@ -278,7 +315,7 @@ public class Main {
             }
         }
     }
-
+    //break this off to a decide players and play stage.
     public ArrayList<Player> playStage(Quest q, Player sponsor){
         //do stuff
         ArrayList<Player> eligblep = new ArrayList<>(0);
@@ -316,7 +353,7 @@ public class Main {
                                 eligblep.get(o).addCardToHand(draw);
                             }else {
                                 eligblep.get(o).addCardToHand(draw);
-                                display.clearScreen(true);
+                                display.clearScreen(false);
                             }
                         }
                     }
@@ -489,6 +526,8 @@ public class Main {
             sponsor.handSize++;
         }
         sponsor.addCardToHand(main_deck.DrawAdventureCard());
+        this.sponsor = null;
+        current_q = null;
     }
 
     public boolean waitForEnter(boolean test){

@@ -5,8 +5,8 @@ import java.util.Collections;
 public class Deck {
     int a_deck_size;
     int e_deck_size;
-    ArrayList<AdventureCard> adventure_cards;
-    ArrayList<EventCard> event_cards;
+    public ArrayList<AdventureCard> adventure_cards;
+    public ArrayList<EventCard> event_cards;
     public Deck() {
         a_deck_size = 0;
         e_deck_size = 0;

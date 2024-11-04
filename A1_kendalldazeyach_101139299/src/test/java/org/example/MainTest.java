@@ -312,8 +312,9 @@ class MainTest {
     @Test
     @DisplayName("The current player has drawn a Q card, prompts current player for sponsorship")
     void RESP_11_test_01() {
+        ByteArrayInputStream in = new ByteArrayInputStream(("" +System.lineSeparator()).getBytes());
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         EventCard e = new EventCard("Q5","Q",10);
         Game.main_deck.event_cards.set(0,e);
@@ -329,7 +330,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         EventCard e = new EventCard("Q5","Q",1);
         Game.main_deck.event_cards.set(0,e);
@@ -345,7 +346,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         EventCard e = new EventCard("Q5","t",0);
         Game.main_deck.event_cards.set(0,e);
@@ -362,7 +363,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" + System.lineSeparator()+ "1" + System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -384,7 +385,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "wads" +System.lineSeparator() +  "1"+System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -406,7 +407,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "13" + System.lineSeparator() + "1"+System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -451,7 +452,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "1"+System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -472,7 +473,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "1"+System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -494,7 +495,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" + System.lineSeparator()+ "Quit" + System.lineSeparator() + "1"+ System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -516,7 +517,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" + System.lineSeparator()+ "1" + System.lineSeparator() + "Quit"+ System.lineSeparator() + "2"+ System.lineSeparator() + "Quit" + System.lineSeparator() + "3" + System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         Player sponsor = new Player("p3",3,Game.display);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -545,7 +546,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "yes" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" + System.lineSeparator()+ "1" + System.lineSeparator() + "Quit"+ System.lineSeparator() + "3"+ System.lineSeparator() + "Quit" + System.lineSeparator() + "2" + System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(true,true);
+        Main Game = new Main(false,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -813,19 +814,31 @@ class MainTest {
         System.setOut(standardOut);
         System.out.flush();
         //setup mock input based on scenario
-        ByteArrayInputStream in = new ByteArrayInputStream(("" +System.lineSeparator() + "no" +System.lineSeparator() + "yes" +System.lineSeparator() +"1" +System.lineSeparator()
-        +"8" +System.lineSeparator()+"Quit" +System.lineSeparator()+"3" +System.lineSeparator()+"7" + System.lineSeparator() +"Quit" + System.lineSeparator()+"4" +System.lineSeparator()+"6" +System.lineSeparator()+"11" +System.lineSeparator() +
-                "Quit" +System.lineSeparator() + "5" + System.lineSeparator() +"10"+System.lineSeparator() + "Quit" +System.lineSeparator()+ "t" +System.lineSeparator()+ "1" +System.lineSeparator()+ "" +System.lineSeparator() +
-                "t" +System.lineSeparator()+ "1" +System.lineSeparator()+ "" +System.lineSeparator() + "t" +System.lineSeparator()+ "1" +System.lineSeparator()+ "" +System.lineSeparator()+ "5"+System.lineSeparator()+ "6" +System.lineSeparator()+ "Quit"+System.lineSeparator()+ "5"+System.lineSeparator()+ "4" +System.lineSeparator()+ "Quit"
+        ByteArrayInputStream in = new ByteArrayInputStream(("" +System.lineSeparator() + "no" +System.lineSeparator() + "yes"
+                +System.lineSeparator() +"1" +System.lineSeparator() +"8" +System.lineSeparator()+"Quit" +
+                System.lineSeparator()+"3" +System.lineSeparator()+"7" + System.lineSeparator() +"Quit"
+                + System.lineSeparator()+"4" +System.lineSeparator()+"6" +System.lineSeparator()+"11" +System.lineSeparator() + "Quit"
+                +System.lineSeparator() + "5" + System.lineSeparator() +"10"+System.lineSeparator() + "Quit"
+                +System.lineSeparator()+ "t" +System.lineSeparator()+ "1" +System.lineSeparator()+ ""
+                +System.lineSeparator() + "t" +System.lineSeparator()+ "1" +System.lineSeparator()+ ""
+                +System.lineSeparator() + "t" +System.lineSeparator()+ "1" +System.lineSeparator()+ ""
+                +System.lineSeparator()+ "5"+System.lineSeparator()+ "6" +System.lineSeparator()+ "Quit"
+                +System.lineSeparator()+ "5"+System.lineSeparator()+ "4" +System.lineSeparator()+ "Quit"
                 +System.lineSeparator()+ "5"+System.lineSeparator()+ "8" +System.lineSeparator()+ "Quit"
-                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""+System.lineSeparator()+ "t"+System.lineSeparator()+ ""+System.lineSeparator()+ "t"+System.lineSeparator()+ ""
-                +System.lineSeparator()+ "7"+System.lineSeparator()+ "6"+System.lineSeparator()+ "Quit"+System.lineSeparator()+ "9"+System.lineSeparator()+ "4"+System.lineSeparator()+ "Quit"+System.lineSeparator()+ "6" +System.lineSeparator()+ "8"+System.lineSeparator()+ "Quit"
-                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""+System.lineSeparator()+ "t"+System.lineSeparator()+ ""+System.lineSeparator()+
-                "10"+System.lineSeparator()+ "6"+System.lineSeparator()+ "5"+System.lineSeparator()+ "Quit"+System.lineSeparator()+
-                "7"+System.lineSeparator()+ "5" +System.lineSeparator()+ "9"+System.lineSeparator()+ "Quit"
-                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""+System.lineSeparator()+ "t"+System.lineSeparator()+ "" + System.lineSeparator()+
-                "7"+System.lineSeparator()+ "6" +System.lineSeparator()+ "8"+System.lineSeparator()+ "Quit"+ System.lineSeparator()+
-                "4"+System.lineSeparator()+ "5" +System.lineSeparator()+ "6"+System.lineSeparator()+ "8"+System.lineSeparator()+ "Quit"
+                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""
+                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""
+                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""
+                +System.lineSeparator()+ "7"+System.lineSeparator()+ "6"+System.lineSeparator()+ "Quit"
+                +System.lineSeparator()+ "9"+System.lineSeparator()+ "4"+System.lineSeparator()+ "Quit"
+                +System.lineSeparator()+ "6" +System.lineSeparator()+ "8"+System.lineSeparator()+ "Quit"
+                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""
+                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""
+                +System.lineSeparator()+ "10"+System.lineSeparator()+ "6"+System.lineSeparator()+ "5"+System.lineSeparator()+ "Quit"
+                +System.lineSeparator()+ "7"+System.lineSeparator()+ "5" +System.lineSeparator()+ "9"+System.lineSeparator()+ "Quit"
+                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""
+                +System.lineSeparator()+ "t"+System.lineSeparator()+ ""
+                + System.lineSeparator()+ "7"+System.lineSeparator()+ "6" +System.lineSeparator()+ "8"+System.lineSeparator()+ "Quit"
+                + System.lineSeparator()+ "4"+System.lineSeparator()+ "5" +System.lineSeparator()+ "6"+System.lineSeparator()+ "8"+System.lineSeparator()+ "Quit"
                 +"" +System.lineSeparator()+"1" +System.lineSeparator()+"1" +System.lineSeparator()+"1" +System.lineSeparator() + "1"+System.lineSeparator() + ""
 
         ).getBytes());
@@ -912,6 +925,7 @@ class MainTest {
         Game.main_deck.adventure_cards.set(9,new AdventureCard("L20", "L", 20));
         //run the game
         Game.begin(Game);
+        Game.playStage(Game.current_q,Game.sponsor);
 
         //all the asserts here
         //assert p1 has no shields and the proper cards
