@@ -314,12 +314,12 @@ class MainTest {
     void RESP_11_test_01() {
         ByteArrayInputStream in = new ByteArrayInputStream(("" +System.lineSeparator()).getBytes());
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(false,true);
+        Main Game = new Main(true,true);
         Game.distributeHands(12);
         EventCard e = new EventCard("Q5","Q",10);
         Game.main_deck.event_cards.set(0,e);
-        Game.nextEvent();
-        Boolean quest_req= outputStreamCaptor.toString().trim().replace("\r","").contains("The Next Event Card Is: Q5,\n"+Game.currentPlayer.name+ " Would you like to sponsor this quest?:");
+        Game.initiateQuest(10);
+        Boolean quest_req= outputStreamCaptor.toString().trim().replace("\r","").contains(Game.currentPlayer.name+ " Would you like to sponsor this quest?:");
         //check the display
         assertEquals(true, quest_req);
     }
@@ -334,7 +334,7 @@ class MainTest {
         Game.distributeHands(12);
         EventCard e = new EventCard("Q5","Q",1);
         Game.main_deck.event_cards.set(0,e);
-        Game.nextEvent();
+        Game.initiateQuest(1);
         Boolean quest_fail= outputStreamCaptor.toString().trim().replace("\r","").contains("No Sponsorship, Quest Abandoned");
         //check the display
         assertEquals(true, quest_fail);
@@ -473,15 +473,16 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" +System.lineSeparator() + "1"+System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(false,true);
+        Main Game = new Main(true,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
         sponsor.hand.set(0,a1);
         Game.players.set(3,sponsor);
-        EventCard e = new EventCard("Q5","t",1);
+        EventCard e = new EventCard("Q1","t",1);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
+        Game.setupStage(1, sponsor, null);
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Stage:");
         sponsor_hand=sponsor_hand && outputStreamCaptor.toString().trim().replace("\r","").contains("F5");
         //check the display
@@ -514,10 +515,10 @@ class MainTest {
     @Test
     @DisplayName("The sponsor has entered 'Quit' and the stage is less than the previous. The sponsor now adds another card and the stage value is greater")
     void RESP_16_test_01() {
-        ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "no" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" + System.lineSeparator()+ "1" + System.lineSeparator() + "Quit"+ System.lineSeparator() + "2"+ System.lineSeparator() + "Quit" + System.lineSeparator() + "3" + System.lineSeparator() + "Quit").getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + System.lineSeparator() + "Quit"+ System.lineSeparator() + "2"+ System.lineSeparator() + "Quit" + System.lineSeparator() + "3" + System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(false,true);
+        Main Game = new Main(true,true);
         Game.distributeHands(12);
         Player sponsor = new Player("p3",3,Game.display);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -530,10 +531,13 @@ class MainTest {
         sponsor.hand.add(a2);
         sponsor.hand.add(a3);
         sponsor.hand.add(a4);
+        sponsor.sortHand();
         Game.players.set(3,sponsor);
         EventCard e = new EventCard("Q5","t",2);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
+        Player s = Game.setupStage(1, sponsor, null);
+        Game.setupStage(2,sponsor,s);
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("A stage cannot be less than the previous");
         sponsor_hand= sponsor_hand && outputStreamCaptor.toString().trim().replace("\r","").contains("Setup Finished");
         //check the display
@@ -546,7 +550,7 @@ class MainTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("no" + System.lineSeparator() + "yes" + System.lineSeparator() + "no" + System.lineSeparator() + "yes" + System.lineSeparator()+ "1" + System.lineSeparator() + "Quit"+ System.lineSeparator() + "3"+ System.lineSeparator() + "Quit" + System.lineSeparator() + "2" + System.lineSeparator() + "Quit").getBytes());
         System.setIn(in);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Main Game = new Main(false,true);
+        Main Game = new Main(true,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
         AdventureCard a1 = new AdventureCard("F5","F",5);
@@ -561,6 +565,7 @@ class MainTest {
         EventCard e = new EventCard("Q5","t",2);
         Game.main_deck.event_cards.set(0,e);
         Game.nextEvent();
+        Game.initiateQuest(2);
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Cannot sponsor with the current hand");
         //check the display
         assertEquals(true, sponsor_hand);
@@ -573,7 +578,8 @@ class MainTest {
         Main Game = new Main(true,true);
         Game.distributeHands(12);
         Player sponsor = Game.getPlayer(3);
-        Game.playStage(null,sponsor);
+        Game.sponsor = sponsor;
+        Game.decidePlayers(null, null);
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Eligible Players:\np1\np2\np3");
         //check the display
         assertEquals(true, sponsor_hand);
@@ -586,11 +592,11 @@ class MainTest {
         System.setIn(in);
         Main Game = new Main(true,true);
         Game.distributeHands(8);
-        Player sponsor = Game.getPlayer(3);
+        Game.sponsor = Game.getPlayer(3);
         Quest q = new Quest(-1);
         q.stages.add(new Player("Stage1",-1,Game.display));
         System.setOut(new PrintStream(outputStreamCaptor));
-        Game.playStage(q,sponsor);
+        Game.decidePlayers(q,null);
         //check the display
         assertEquals("Eligible Players:\n" +
                 "p1\n" +
@@ -607,6 +613,7 @@ class MainTest {
         Main Game = new Main(true,true);
         Game.distributeHands(10);
         Player sponsor = Game.getPlayer(3);
+        Game.sponsor = sponsor;
         Quest q = new Quest(-2);
         q.stageCount = -1;
         q.stages.add(new Player("Stage1",-1,Game.display));
@@ -614,7 +621,7 @@ class MainTest {
         e.addAll(Game.players);
         e.remove(sponsor);
         e.removeLast();
-        assertEquals(2,Game.playStage(q,sponsor).size());
+        assertEquals(2,Game.decidePlayers(q,null).size());
     }
 
     @Test
@@ -634,7 +641,8 @@ class MainTest {
         p3.trimHand(2);
         Quest q = new Quest(1);
         q.stages.add(new Player("Stage1",-1,Game.display));
-        Game.playStage(q,sponsor);
+        Game.sponsor = sponsor;
+        Game.decidePlayers(q,null);
         assertEquals(11, p1.handSize);
         assertEquals(12, p2.handSize);
         assertEquals(11, p3.handSize);
@@ -651,9 +659,11 @@ class MainTest {
         Quest q = new Quest(1);
         Player s1 = new Player("Stage 1", -1,Game.display);
         q.addStage(s1);
+        Game.current_q = q;
+        Game.sponsor = sponsor;
         System.setOut(new PrintStream(outputStreamCaptor));
         q.stageCount = 1;
-        Game.playStage(q,sponsor);
+        Game.decidePlayers(q,new ArrayList<Player>(0));
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Quest Finished!");
         assertEquals(true, sponsor_hand);
     }
@@ -674,7 +684,8 @@ class MainTest {
         q.addStage(s1);
         q.addStage(s2);
         int s = sponsor.getHandSize();
-        Game.endQuest(null,sponsor);
+        ArrayList<Player> players = new ArrayList<>(0);
+        Game.endQuest(null,sponsor, players);
         int d = sponsor.getHandSize();
         assertEquals((s-2), d);
     }
@@ -695,7 +706,7 @@ class MainTest {
         q.addStage(s1);
         q.addStage(s2);
         int s = sponsor.getHandSize();
-        Game.endQuest(q,sponsor);
+        Game.endQuest(q,sponsor, Game.players);
         int d = sponsor.getHandSize();
         assertEquals((s+2),d);
     }
@@ -709,7 +720,7 @@ class MainTest {
         ArrayList<Player> eligible = new ArrayList<>(0);
         eligible.add(p1);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Game.setupAttack(eligible,null);
+        Game.setupAttack(p1,null);
         assertEquals("Setup Attack:\np1\nHand:\n1: "+p1.hand.get(0).name,outputStreamCaptor.toString().trim().replace("\r",""));
     }
 
@@ -726,7 +737,7 @@ class MainTest {
         p1.hand.add( new AdventureCard("L20", "L", 20));
         eligible.add(p1);
         System.setOut(new PrintStream(outputStreamCaptor));
-        Game.setupAttack(eligible,new Player("Stage 1",-1,Game.display));
+        Game.setupAttack(p1,new Player("Stage 1",-1,Game.display));
         String attack_displa = outputStreamCaptor.toString().trim().replace("\r","").replace("\n","");
         Boolean attack_display = outputStreamCaptor.toString().trim().replace("\r","").replace("\n","").contains("Cards in attack: attack value: 251: D52: L20");
         assertEquals(true, attack_display);
@@ -744,8 +755,11 @@ class MainTest {
         atk.shields = 5;
         eligible.add(atk);
         stage.shields = 10;
+        Game.current_q = new Quest(1);
+        Game.current_q.addStage(stage);
+        Game.current_q.attacks = eligible;
         System.setOut(new PrintStream(outputStreamCaptor));
-        Game.playAttack(eligible,stage);
+        Game.playAttack(stage);
         Boolean attack_display = outputStreamCaptor.toString().trim().replace("\r","").contains("p1 Loses, attack: 5\np1 fails the quest");
         assertEquals(true, attack_display);
     }
@@ -753,7 +767,7 @@ class MainTest {
     @Test
     @DisplayName("participants with an attack equal or greater to the value of the current stage are eligible for the next stage (if any). If this is the last stage, they are winners of this quest and earn as many shields as there are stages to this quest\n")
     void RESP_26_test_01() {
-        ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() + "" + System.lineSeparator() +"w" + System.lineSeparator() + "w" + System.lineSeparator()+ "8" + System.lineSeparator()+ "Quit" + System.lineSeparator()+ "7" + System.lineSeparator()+ "Quit" + System.lineSeparator()).getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(("8" + System.lineSeparator()+ "Quit" + System.lineSeparator()+ "7" + System.lineSeparator()+ "Quit" + System.lineSeparator()).getBytes());
         System.setIn(in);
         Main Game = new Main(true,true);
         Game.distributeHands(8);
@@ -767,26 +781,36 @@ class MainTest {
         Player p1 = Game.getPlayer(0);
         p1.hand.set(0, new AdventureCard("E30", "E", 30));
         p1.hand.set(1, new AdventureCard("S10", "S", 10));
-        assertEquals(1,Game.playStage(q,sponsor).size());
+        Game.current_q = q;
+        ArrayList<Player> eligible = new ArrayList<>();
+        eligible.add(p1);
+        eligible = Game.endQuest(q, sponsor, Game.attackResult(Game.playAttack(Game.setupAttack(p1,s1)),eligible));
+        assertEquals(1,eligible.size());
         assertEquals(1,p1.shields);
     }
 
     @Test
     @DisplayName("All participants of the current stage have all the cards they used for their attack of the current stage discarded by the game.")
     void RESP_27_test_01() {
-        ByteArrayInputStream in = new ByteArrayInputStream(("t" + System.lineSeparator() +"" + System.lineSeparator() + "w" + System.lineSeparator() + "w" + System.lineSeparator()+ "9" + System.lineSeparator()+ "Quit"+ System.lineSeparator()+ "").getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(( "8" + System.lineSeparator()+ "Quit"+ System.lineSeparator()+ "").getBytes());
         System.setIn(in);
         Main Game = new Main(true,true);
         Game.distributeHands(8);
         Player sponsor = Game.getPlayer(3);
         Quest q = new Quest(1);
+        Game.sponsor = sponsor;
+        Game.current_q = q;
         Player s1 = new Player("Stage 1", -1,Game.display);
         s1.addCardToHand(new AdventureCard("F5", "F", 5));
         s1.shields =5;
         q.addStage(s1);
         Player p1 = Game.getPlayer(0);
         p1.hand.set(7, new AdventureCard("E35", "E", 350));
-        Game.playStage(q,sponsor);
+        p1.sortHand();
+        ArrayList<Player> eligible = new ArrayList<>();
+        eligible.add(Game.setupAttack(p1,s1));
+        Game.current_q.attacks = eligible;
+        Game.playAttack(s1);
         boolean test = true;
         for (int i = 0; i < p1.hand.size(); i++) {
             if (Objects.equals(p1.hand.get(i).name, "E35")){
@@ -843,7 +867,7 @@ class MainTest {
 
         ).getBytes());
         System.setIn(in);
-        Main Game = new Main(true,false);
+        Main Game = new Main(false,false);
         Game.distributeHands(12);
         //fix p1 hand
         Player p1 = new Player("p1",0, Game.display);
@@ -925,7 +949,8 @@ class MainTest {
         Game.main_deck.adventure_cards.set(9,new AdventureCard("L20", "L", 20));
         //run the game
         Game.begin(Game);
-        Game.playStage(Game.current_q,Game.sponsor);
+        Game.current_q.setupPlay();
+        Game.decidePlayers(Game.current_q,null);
 
         //all the asserts here
         //assert p1 has no shields and the proper cards

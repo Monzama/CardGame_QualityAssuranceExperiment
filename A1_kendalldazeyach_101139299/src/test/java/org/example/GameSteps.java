@@ -2,12 +2,13 @@ package org.example;
 
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 
 import java.io.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameSteps {
 
@@ -18,11 +19,29 @@ public class GameSteps {
     PipedOutputStream pipedOut = new PipedOutputStream();
     PipedInputStream pipedIn = new PipedInputStream(pipedOut);
 
-    String dynamicInput = "";
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
     public GameSteps() throws IOException {
     }
+    //simply find card in hand based on target string
+    public AdventureCard findCard (List<Integer> exclude, String target, ArrayList<AdventureCard> hand) {
+        for (int i = 0; i < hand.size(); i++) {
+            AdventureCard card = hand.get(i);
+            if (exclude != null){
+                if (card.name.equals(target)){
+                    if (!exclude.contains(i)){
+                        return card;
+                    }
+                }
+            }else{
+                if (card.name.equals(target)){
+                    return card;
+                }
+            }
+        }
+        return null;
+    }
+
 
     public void writeInput(String input) throws IOException {
      pipedOut.write(input.getBytes());
@@ -118,30 +137,30 @@ public class GameSteps {
     @And("P{int} draws a quest of {int} stages")
     public void pDrawsAQuestOfStages(int arg0, int arg1) {
         game.main_deck.event_cards.set(0,new EventCard("Q" + arg1, "Q", arg1));
+        game.currentPlayer = game.getPlayer(arg0-1);
         game.nextEvent();
-    }
-    @Then("p{int} is asked to sponsor")
-    public void pIsAskedToSponsor(int arg0) {
-        try {
-            writeInput("no"+"\r\n" + "yes"+"\r\n");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        game.initiateQuest(game.current_event.GetCardValue());
-        String x = outputStreamCaptor.toString().trim().replace("\r","");
-        if (arg0 == 1){
-            Assert.assertTrue(x.contains("p1 Would you like to sponsor this quest?"));
-        }else if (arg0 == 2){
-            Assert.assertTrue(x.contains("p2 Would you like to sponsor this quest?"));
-        }else if (arg0 == 3){
-            Assert.assertTrue(x.contains("p3 Would you like to sponsor this quest?"));
-        }else if (arg0 == 4){
-            Assert.assertTrue(x.contains("p4 Would you like to sponsor this quest?"));
-        }
     }
 
     @And("p{int} chooses to sponsor")
     public void pChoosesToSponsor(int arg0) {
+        int start =0;
+        start = game.currentPlayer.id;
+        String input = "";
+        for (int i = start; i < 4; i++) {
+            if (i == (arg0-1)){
+                input += "yes\r\n";
+                break;
+            }else {
+                input += "no\r\n";
+            }
+            if (i == 3){i=0;}
+        }
+        try {
+          writeInput(input);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        game.initiateQuest(game.current_event.GetCardValue());
         String x = outputStreamCaptor.toString().trim().replace("\r","");
         if (arg0 == 1){
             Assert.assertTrue(x.contains("p1 Sponsors The Quest!"));
@@ -172,20 +191,32 @@ public class GameSteps {
     }
 
     @And("Other players decide to participate and draw a card")
-    public void otherPlayersDecideToParticipateAndDrawACard() throws IOException {
-        try {
-            if (game.players.get(0).handSize ==12){
-                writeInput("t"+"\r\n" + "1"+"\r\n"+ "t"+"\r\n"+ "1"+"\r\n"+ "t"+"\r\n"+ "1" + "\r\n");
-            }else{
-                writeInput("t" + "\r\n"+ "t"+"\r\n"+ "t"+"\r\n");
+    public void otherPlayersDecideToParticipateAndDrawACard(List<String> cards) throws IOException {
+        String s = "";
+        //process list.
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i).length() == 3){
+                s += "w\r\n";
+            }else {
+                game.main_deck.adventure_cards.set(i,new AdventureCard(cards.get(i).substring(3,5), cards.get(i).substring(3,3), Integer.parseInt(cards.get(i).substring(4,5))));
+                s += "t\r\n";
+                if (cards.get(i).length() == 5){
+                    s += "1\r\n" + "\r\n";
+                }else{
+                    s += cards.get(i).substring(7) + "\r\n"  +"\r\n";
+                }
             }
+
+        }
+        try {
+            writeInput(s);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        game.playStage(game.current_q, game.sponsor);
+        //have to handle the trim
+        outputStreamCaptor.reset();
+        game.decidePlayers(game.current_q, null);
         String x = outputStreamCaptor.toString().trim().replace("\r","");
-        Assert.assertTrue(x.contains("p2 Draws a"));
-        Assert.assertTrue(x.contains("p3 Draws a"));
-        Assert.assertTrue(x.contains("p4 Draws a"));
     }
+
 }

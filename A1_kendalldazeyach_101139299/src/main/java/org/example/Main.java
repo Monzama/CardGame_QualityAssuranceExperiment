@@ -1,5 +1,7 @@
 package org.example;
 
+import io.cucumber.java.cy_gb.A;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -17,7 +19,7 @@ public class Main {
     Quest current_q;
     Player sponsor;
 
-
+    public ArrayList<Player> eligible = new ArrayList<Player>(0);
 
     public Main(boolean test) {
         display = new Display();
@@ -58,8 +60,11 @@ public class Main {
         main.begin(main);
         while (main.game_on &&main.loop) {
             main.nextTurn();
+            //ArrayList<Player> eligible = null;
             if (main.sponsor != null){
-                main.playStage(main.current_q, main.sponsor);
+                main.current_q.setupPlay();
+                main.decidePlayers(main.current_q,null);
+                //main.playStage(main.current_q, main.sponsor);
             }
         }
     }
@@ -88,7 +93,7 @@ public class Main {
 
     public void nextEvent(){
         if (game_on) {
-            display.clearScreen(false);
+            display.clearScreen(true);
         }
         current_event = DrawEventCard();
         System.out.println("The Next Event Card Is: "+current_event.name + ",");
@@ -138,7 +143,6 @@ public class Main {
                 players.set(1, p2);
                 players.set(2, p3);
                 players.set(3, p4);
-                currentPlayer = players.get(0);
                 if (game_on) {
                     waitForEnter(false);
                     return;
@@ -230,6 +234,7 @@ public class Main {
             }
             //do something
             Player s = setupStage((i+1), sponsor, q.previousStage);
+            s.id = i;
             q.addStage(s);
         }
         if (!Objects.equals(current_event.type, "t")){
@@ -315,6 +320,9 @@ public class Main {
     }
     //break this off to a decide players and play stage.
     public ArrayList<Player> decidePlayers (Quest q, ArrayList<Player> eligble){
+        if (this.sponsor ==null){
+            return eligble;
+        }
         if (eligble == null){
             eligble = new ArrayList<>(0);
             eligble.addAll(players);
@@ -345,32 +353,62 @@ public class Main {
                     eligble.get(o).addCardToHand(draw);
                 }else {
                     eligble.get(o).addCardToHand(draw);
-                    display.clearScreen(false);
+                    display.clearScreen(true);
                 }
             }
         }
+        if (eligble.isEmpty()){
+            endQuest(current_q, sponsor, eligble);
+            return eligble;
+        }
         if (game_on){
-            playStage(q,sponsor,eligble, q.previousStage);
+            if (q.previousStage == null){
+                q.previousStage = q.stages.getFirst();
+                playStage(q,eligble);
+                return eligble;
+            }else{
+                if (q.nextStage() == null){
+                    return eligble;
+                }else{
+                    playStage(q,eligble);
+                    return eligble;
+                }
+
+            }
         }
         return eligble;
     }
 
 
-    public ArrayList<Player> playStage(Quest q, Player sponsor, ArrayList<Player> eligblep, Player cur_stage){
+    public ArrayList<Player> playStage(Quest q,ArrayList<Player> eligblep){
         //should only be the participants here
         //play one stage and call decide players if gameon
         if (q.stageCount <=0){
             return eligblep;
         }
-        if (eligblep.size()==0){
+        //setup player and stage attacks
+        Player s = q.currentStage;
+
+        if (game_on) {
+            ArrayList<Player> results = new ArrayList<>();
+            for (int i = 0; i < eligblep.size(); i++) {
+                results.add(setupAttack(eligblep.get(i), s));
+            }
+            q.attacks = results;
+            eligblep = attackResult(playAttack(q.currentStage), eligblep);
+            decidePlayers(q, eligblep);
+
+        }
+        return eligblep;
+    }
+
+    public ArrayList<Player> attackResult(ArrayList<Player> results, ArrayList<Player> eligblep){
+        if (eligblep.isEmpty()){
             //everyone loses. except the sponsor i think
             System.out.println("Quest Failed!");
-            endQuest(q,sponsor);
+            endQuest(current_q,sponsor,eligblep);
             return eligblep;
         }
-        //remove player from eligible list
-        Player s = q.stages.get();
-        ArrayList<Player> results = setupAttack(eligblep,s);
         for (int j = 0; j < results.size(); j++) {
             Player r = results.get(j);
             if (r.shields == -1){
@@ -382,44 +420,23 @@ public class Main {
                 }
             }
         }
-        if (eligblep.size()==0){
-            //everyone loses. except the sponsor i think
-            System.out.println("Quest Failed!");
-            endQuest(q,sponsor);
-            return eligblep;
-        }
-        if (s == q.stages.getLast()){
-            for (int j = 0; j < eligblep.size(); j++) {
-                Player r = eligblep.get(j);
-                for (int k = 0; k < players.size(); k++) {
-                    Player p = players.get(k);
-                    if (Objects.equals(p.name, r.name)){
-                        System.out.println(p.name + " Completes the quest and earns " + q.stageCount + " shields!");
-                        p.adjustShields(q.stageCount);
-                    }
-                }
-            }
-            endQuest(q,sponsor);
-            return eligblep;
+        if (game_on && current_q.currentStage == current_q.stages.getLast()){
+            endQuest(current_q,sponsor,eligblep);
         }
         return eligblep;
-    }
+        }
 
-    public ArrayList<Player> setupAttack(ArrayList<Player> eligblep, Player stage){
+    public Player setupAttack(Player p, Player stage)   {
         //prompt for next card to include in attack
-        ArrayList<Player> attacks = new ArrayList<>(0);
-        for (int i = 0; i <eligblep.size() ; i++) {
             display.clearScreen(false);
-            Player atk = new Player(eligblep.get(i).name,-2,display);
-           Player p = eligblep.get(i);
+            Player atk = new Player(p.name,-2,display);
             //display.displayHand(stage);
             System.out.println("Setup Attack:");
             System.out.println(p.name);
             display.displayHand(p);
-            while (attacks.size() < eligblep.size() && stage!=null) {
+            while (stage!=null) {
                 String response = display.getMessage("Select a card to add to the attack or 'Quit' if done");
                 if (response.equals("Quit")){
-                        attacks.add(atk);
                         break;
                 }else{
                     int index = -1;
@@ -450,14 +467,13 @@ public class Main {
                 }
                 display.displayHand(p);
             }
-
-        }
-        display.clearScreen(false);
-        return playAttack(attacks, stage);
+            display.clearScreen(false);
+            return atk;
     }
     //p1 Loses, attack: 5 stage: 10
     //p1 fails the quest
-    public ArrayList<Player> playAttack(ArrayList<Player> attacks, Player stage){
+    public ArrayList<Player> playAttack(Player stage){
+        ArrayList<Player> attacks = current_q.attacks;
         //check if attacks win or lose
         for (int i = 0; i < attacks.size(); i++) {
             if (attacks.get(i).shields < stage.shields) {
@@ -506,31 +522,41 @@ public class Main {
     }
 
 
-    public void endQuest(Quest q, Player sponsor){
-        System.out.println("Quest Finished!");
-        this.QuestBoard.clear();
-        if (q == null){
+    public ArrayList<Player> endQuest(Quest q, Player sponsor, ArrayList<Player> eligblep) {
+        if (q==null){
             sponsor.trimHand(2);
             sponsor.trimHand(2);
-            return;
+            return eligblep;
         }
-        int counter = q.stageCount;
-        for (int i = 0; i < q.stageCount; i++) {
-            for (int j = 0; j < q.stages.get(i).hand.size(); j++) {
-                counter++;
-                sponsor.hand.remove(q.stages.get(i).hand.get(j));
-                sponsor.handSize--;
+        for (int j = 0; j < eligblep.size(); j++) {
+            Player r = eligblep.get(j);
+            for (int k = 0; k < players.size(); k++) {
+                Player p = players.get(k);
+                if (Objects.equals(p.name, r.name)) {
+                    System.out.println(p.name + " Completes the quest and earns " + q.stageCount + " shields!");
+                    p.adjustShields(q.stageCount);
+                }
             }
         }
-        for (int l = 0; l < (counter-1); l++) {
-            sponsor.hand.add(main_deck.DrawAdventureCard());
-            sponsor.handSize++;
-        }
-        sponsor.addCardToHand(main_deck.DrawAdventureCard());
-        this.sponsor = null;
-        current_q = null;
+            System.out.println("Quest Finished!");
+            this.QuestBoard.clear();
+            int counter = q.stageCount;
+            for (int i = 0; i < q.stageCount; i++) {
+                for (int z = 0; z < q.stages.get(i).hand.size(); z++) {
+                    counter++;
+                    sponsor.hand.remove(q.stages.get(i).hand.get(z));
+                    sponsor.handSize--;
+                }
+            }
+            for (int l = 0; l < (counter - 1); l++) {
+                sponsor.hand.add(main_deck.DrawAdventureCard());
+                sponsor.handSize++;
+            }
+            sponsor.addCardToHand(main_deck.DrawAdventureCard());
+            this.sponsor = null;
+            current_q = null;
+            return eligblep;
     }
-
     public boolean waitForEnter(boolean test){
         if (test){
             endTurn();
