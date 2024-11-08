@@ -351,13 +351,15 @@ public class Main {
                 System.out.println(eligble.get(o).name + " Draws a " + draw.GetCardName());
                 if (eligble.get(o).handSize ==12){
                     eligble.get(o).addCardToHand(draw);
+                    eligble.get(o).sortHand();
                 }else {
                     eligble.get(o).addCardToHand(draw);
+                    eligble.get(o).sortHand();
                     display.clearScreen(true);
                 }
             }
         }
-        if (eligble.isEmpty()){
+        if (eligble.isEmpty() && game_on){
             endQuest(current_q, sponsor, eligble);
             return eligble;
         }

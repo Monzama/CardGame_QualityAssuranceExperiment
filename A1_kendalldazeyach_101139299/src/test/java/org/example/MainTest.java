@@ -663,7 +663,8 @@ class MainTest {
         Game.sponsor = sponsor;
         System.setOut(new PrintStream(outputStreamCaptor));
         q.stageCount = 1;
-        Game.decidePlayers(q,new ArrayList<Player>(0));
+        ArrayList<Player> e = Game.decidePlayers(q,new ArrayList<Player>(0));
+        Game.endQuest(Game.current_q, Game.sponsor, e);
         Boolean sponsor_hand= outputStreamCaptor.toString().trim().replace("\r","").contains("Quest Finished!");
         assertEquals(true, sponsor_hand);
     }
