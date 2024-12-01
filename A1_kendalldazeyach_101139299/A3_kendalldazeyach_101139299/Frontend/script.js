@@ -1,48 +1,51 @@
 var stompClient = null;
 const consoleDiv = document.getElementById("console");
 const inputBar = document.getElementById("input-bar");
+const continueButton = document.getElementById("continue-button"); // Select the Continue button
+
+if (!consoleDiv || !inputBar) {
+    console.error("consoleDiv or inputBar not found in the DOM");
+}
+
+let isConnected = false;
 
 function connect() {
+    if (isConnected) return; // Prevent duplicate connections
     var socket = new SockJS('http://127.0.0.1:8080/ws');
     stompClient = Stomp.over(socket);
+
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
+        isConnected = true;
 
-        // Subscribe to /topic/public
-        stompClient.subscribe('/topic/public', function (message) {
-            showMessage(JSON.parse(message.body));
-        });
-
-        // Subscribe to /topic/console
+        // Subscribe to console topic
         stompClient.subscribe('/topic/console', function (message) {
             console.log("Message from server: " + message.body);
 
-            if (message.body === "clear-console") {
-                // Clear the console UI
+            if (message.body.trim() === "clear-console") {
                 while (consoleDiv.firstChild) {
                     consoleDiv.removeChild(consoleDiv.firstChild);
                 }
             } else {
-                // Append the message to the console UI
                 const outputLine = document.createElement("div");
                 outputLine.className = "console-line";
                 outputLine.textContent = message.body;
                 consoleDiv.appendChild(outputLine);
             }
         });
+
+        // Run the reset command after connection is established
+        sendCommand("reset");
+    }, function (error) {
+        console.error('Connection error:', error);
     });
 }
-
-function sendMessage() {
-    var messageContent = document.getElementById("message").value;
-    if (messageContent && stompClient) {
-        var chatMessage = {
-            sender: document.getElementById("username").value,
-            content: messageContent,
-            type: 'CHAT'
-        };
-        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
-        document.getElementById("message").value = '';
+window.onload = function () {
+    connect();
+};
+function sendResponse(response) {
+    if (stompClient) {
+        stompClient.send("/app/send-response", {}, response);
     }
 }
 
@@ -52,25 +55,22 @@ function sendCommand(command) {
     }
 }
 
-function showMessage(message) {
-    var messageElement = document.createElement('li');
-    messageElement.appendChild(document.createTextNode(message.sender + ": " + message.content));
-    document.getElementById('messages').appendChild(messageElement);
-}
-
-window.onload = function () {
-    connect();
-
-    // Add event listener for the input bar
-    inputBar.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            const command = inputBar.value.trim();
-            if (command) {
-                sendCommand(command); // Send the command to the server
+inputBar.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        const command = inputBar.value.trim();
+            if (command === "start"){
                 inputBar.value = ""; // Clear the input field
-            }else{
-                sendCommand("ENTER"); // Process newline for enter only operations
+                sendCommand(command);
+            }else if (command === ""){
+                sendResponse("ENTER");
+            }else if (command === "clear"){
+                while (consoleDiv.firstChild) {
+                    consoleDiv.removeChild(consoleDiv.firstChild);
+                }
+                inputBar.value = "";
+            }else {
+                inputBar.value = ""; // Clear the input field
+                sendResponse(command); // Send the response to the server
             }
-        }
-    });
-};
+    }
+});

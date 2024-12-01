@@ -1,17 +1,13 @@
 package org.example;
-
 import org.springframework.stereotype.Service;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
 
 @Service
 public class GameService {
 
-    private final Display display;
-    private final Main game;
-
-
-
+    private Display display;
+    private Main game;
     @Autowired
     public GameService(Display display) {
         this.display = display;
@@ -20,31 +16,105 @@ public class GameService {
     }
 
     // Start the game
-    public String startGame() {
+    public String startGame() throws InterruptedException {
         game.begin(game);
         System.out.println(display.getOutputLog());
         String t = display.getOutputLog();
-        display.clear();
+        //display.clear();
         return t;
     }
 
-    // Advance the game loop
-    public String nextTurn() {
-        if (!game.game_on) {
-            return "Game is not running!";
+    public boolean getinputlocked() {
+        return game.lockedInput;
+    }
+    public int getGameState() {
+        return game.gameState;
+    }
+
+    public void reset() throws InterruptedException {
+        display.terminateExtraThreads(); // Set termination flag and wake up threads
+        Thread.sleep(100); // Allow threads time to exit
+        synchronized (display) {
+            while (display.waitingThreads.get() > 0) {
+                display.notifyAll(); // Ensure any remaining threads are notified
+                Thread.sleep(50); // Small delay to allow threads to exit
+            }
         }
-        game.nextTurn();
-        return "Turn advanced!";
+        display.clearinput();
+        this.game = new Main(false, display);
+        game.lockedInput = false;
+        game.gameState = -2;
+        System.out.println("GameService initialized");
+        display.resetTerminationFlag(); // Reset termination flag
     }
 
-    // Get current game state
-    public String getGameState() {
-        return "Current Player: " + game.currentPlayer.name;
-    }
 
-    // Handle player response
-    public String handleResponse(String response) {
-        display.setUserResponse(response);
-        return "Response received: " + response;
+    public void cont() throws InterruptedException {
+        //do stuff based on game state
+        switch(game.gameState){
+            case -1://next turn
+                Thread.sleep(100);
+                System.out.println("Next Turn");
+                game.nextTurn();
+                break;
+            case 0:
+                System.out.println("Next Event");
+                game.nextEvent();
+                break;
+            case 1:
+                System.out.println("Setup Stage: " + game.sponsor + " | Quest of " + game.current_event.value + " stages");
+                game.initializeStage(game.sponsor, game.current_event.value);
+                break;
+            case 2:
+                System.out.println("Decide Players");
+                if (game.eligble == null){
+                    game.decidePlayers(game.current_q, null);
+                }else{
+                    game.decidePlayers(game.current_q, game.eligble);
+                }
+                break;
+            case 3:
+                System.out.println("Setup Attacks");
+                if (game.setupPlayer == null){
+                    game.setupPlayer = game.eligble.get(0);
+                }else if (game.eligble.get(game.eligble.size()-1) == game.currentPlayer){
+                    //should not be here
+                    break;
+                }else{
+                    for (int i = 0; i < game.eligble.size(); i++) {
+                        //find next
+                        if (game.eligble.get(i) == game.setupPlayer){
+                            game.setupPlayer = game.eligble.get(i+1);
+                            break;
+                        }
+                    }
+                }
+                System.out.println("Setup: " + game.setupPlayer.name);
+                game.setupAttack(game.setupPlayer, game.current_q.currentStage);
+                if (game.setupPlayer != game.eligble.get(game.eligble.size()-1)){
+                    display.getMessage("Continue to next player's setup?");
+                }
+                break;
+            case 4:
+                System.out.println("Attack results");
+                game.eligble = game.attackResult(game.playAttack(game.current_q.currentStage),game.eligble);
+                System.out.println("Next Stage");
+                if (game.current_q.currentStage.id == game.current_q.stages.size()-1 || game.eligble == null){
+                    //go to end quest
+                    game.gameState = 5;
+                    display.getMessage("End Quest?");
+                }else {
+                    game.current_q.nextStage();
+                    game.current_q.attacks = new ArrayList<>();
+                    game.setupPlayer = null;
+                    game.gameState = 2;
+                    display.getMessage("Next Stage?");
+                }
+                break;
+            case 5:
+                System.out.println("End of Quest");
+                game.endQuest(game.current_q, game.sponsor, game.eligble);
+                break;
+        }
     }
 }

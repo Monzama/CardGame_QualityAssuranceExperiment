@@ -1,14 +1,10 @@
 package org.example;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @RestController
@@ -22,9 +18,9 @@ public class DisplayController {
 
 
     @Autowired
-    public DisplayController(SimpMessagingTemplate messagingTemplate, GameService gameService, Display display) {
+    public DisplayController(SimpMessagingTemplate messagingTemplate, Display display) {
         this.messagingTemplate = messagingTemplate;
-        this.gameService = gameService;
+        this.gameService = new GameService(display);
         this.display = display;
         System.out.println("DisplayController initialized");
     }
@@ -37,68 +33,52 @@ public class DisplayController {
 
     // Start the game
     @PostMapping("/start")
-    public String startGame() {
+    public String startGame() throws InterruptedException {
         clearConsole();
         System.out.println("Game started");
-        String result = gameService.startGame();
-        return result; // HTTP 200
+        gameService.startGame();
+        return ""; // HTTP 200
     }
-    @PostMapping("/command")
-    public void test(){
-        System.out.println("soemthing happened");
+    @PostMapping("/ENTER")
+    public String next() throws InterruptedException {
+        clearConsole();
+        System.out.println("Next");
+        Thread.sleep(200);
+        gameService.cont();
+        return ""; // HTTP 200
     }
-    // Advance to the next turn
-    @PostMapping("/next-turn")
-    public String nextTurn() {
-        return gameService.nextTurn();
-    }
-
-    // Get the current game state
-    @GetMapping("/state")
-    public String getGameState() {
-        return gameService.getGameState();
-    }
-
-    // Send a response to the game
-    @PostMapping("/response")
-    public String sendResponse(@RequestBody String response) {
-        System.out.println("received");
-        return gameService.handleResponse(response);
-    }
-
-    // Get the display messages (for frontend polling)
-    @GetMapping("/messages")
-    public String getMessages() {
-        return display.getOutputLog();
-    }
-    @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/public")
-    public ChatMessage sendMessage(ChatMessage chatMessage) {
-        return chatMessage;
-    }
-
-    @MessageMapping("/chat.addUser")
-    @SendTo("/topic/public")
-    public ChatMessage addUser(ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-        return chatMessage;
+    @MessageMapping("/send-response")
+    public void receiveResponse(String response) throws InterruptedException {
+        System.out.println("Received response: " + response);
+        if (gameService.getGameState() == -2){
+            return;
+        }
+        //check locked input,. do nothing if locked
+        if (gameService.getinputlocked()){
+            System.out.println("Locked");
+            display.setUserResponse(response);
+        }else{
+            System.out.println("Unlocked");
+            display.setUserResponse(response);
+            Thread.sleep(200);
+            next();
+        }
     }
 
     @MessageMapping("/send-command")
     @SendTo("/topic/console")
-    public String processCommand(String command) {
+    public String processCommand(String command) throws InterruptedException {
         // Process the command here
         if (command.equals("start")) {
             return startGame();
+        }else if (command.equals("reset")) {
+            gameService.reset();
+            display.clear();
         }else{
-
+            display.setUserResponse(command);
+            System.out.println("continue");
         }
         System.out.println("Received command: " + command);
         return "Processed: " + command; // Return a response to the frontend
     }
-
-
-
-
-
 }

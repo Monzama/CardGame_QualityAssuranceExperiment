@@ -1,8 +1,6 @@
 package org.example;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
 
 public class Player {
@@ -25,7 +23,7 @@ public class Player {
         return shields;
     }
 
-    public void addCardToHand(AdventureCard c) {
+    public void addCardToHand(AdventureCard c) throws InterruptedException {
         hand.add(c);
         handSize++;
         if (handSize > 12) {
@@ -52,23 +50,32 @@ public class Player {
         if (shields < 0){shields = 0;}
     }
 
-    public boolean trimHand(int index){
+    public boolean trimHand(int index) throws InterruptedException {
         if (index==-1){
-            System.out.println(this.name + " please trim your hand:");
+            display.sendMessage(this.name + " please trim your hand:",false);
         }
         if (index ==-2){
             int n = hand.size() -12;
             for (int i=0;i<n;i++) {
                 sortHand();
-                System.out.println(this.name + " please trim your hand:");
+                display.sendMessage(this.name + " please trim your hand:", false);
                 display.displayHand(this);
-                String r = display.getMessage("Please select your card (1-" + handSize + ")");
-                int remove = Integer.parseInt(r);
-                hand.remove(remove-1);
-                handSize--;
+                Thread.sleep(100);
+                int remove = -1;
+                    String r = display.getMessage("Please select your card (1-" + handSize + ")");
+                    // Default value in case parsing fails
+                    try {
+                        remove = Integer.parseInt(r);
+                        hand.remove(remove-1);
+                        handSize--;
+                    } catch (NumberFormatException e) {
+                        trimHand(index);
+                        System.err.println("Invalid input: '" + r + "' is not a valid integer.");
+                        return false;
+                    }
             }
             sortHand();
-            System.out.print("Trimmed ");
+            display.sendMessage("Trimmed ", false);
             display.displayHand(this);
         } else if (index >=0 && index < handSize) {
             hand.remove(index-1);
@@ -213,8 +220,6 @@ public class Player {
         }
         return true;
     }
-
-
     // Foes in increasing order, then weapons in increasing order, swords before horses.
     public void sortHand() {
         Collections.sort(this.hand);

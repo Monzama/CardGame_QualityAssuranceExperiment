@@ -28,13 +28,4 @@ public class Quest {
         currentStage = stages.get(currentStage.id+1);
         return currentStage;
     }
-    //setts previous stage to null and current stage to stage 1 or get(0)
-    //this allows us to rack what stage using the quest class.
-    public void setupPlay() {
-        previousStage  = null;
-        currentStage = stages.get(0);
-    }
-
-
-
 }
