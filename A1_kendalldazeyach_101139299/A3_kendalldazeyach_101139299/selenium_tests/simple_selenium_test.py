@@ -48,7 +48,7 @@ class BlackjackGameTest(unittest.TestCase):
         input_bar.send_keys(setup_command)
         input_bar.send_keys("\n")  # Simulate pressing Enter
         time.sleep(0.5)  # Wait for the setup to complete
-        sleep_time = 0.02
+        sleep_time = 1
         # Validate the setup command was processed
         console_lines = self.driver.find_elements(By.CSS_SELECTOR, "#console .console-line")
         self.assertTrue(
