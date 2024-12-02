@@ -13,7 +13,9 @@ public class Display {
     private final StringBuilder outputLog = new StringBuilder(); // To store messages for the frontend
     private final AtomicReference<String> userResponse = new AtomicReference<>();
     final AtomicInteger waitingThreads = new AtomicInteger(0); // Track waiting threads
-    private boolean terminateExtraThreads = false; // Flag to terminate extra threads
+    public boolean terminateExtraThreads = false; // Flag to terminate extra threads
+
+    private volatile boolean resetInProgress = false;
 
     @Autowired
     public Display(SimpMessagingTemplate messagingTemplate) {
@@ -21,10 +23,35 @@ public class Display {
         System.out.println("Display initialized");
     }
 
+    public synchronized void terminateExtraThreads() {
+        resetInProgress = true; // Indicate reset is ongoing
+        System.out.println("terminateExtraThreads: Terminating all extra threads.");
+        terminateExtraThreads = true;
+    }
+
+    public synchronized void resetTerminationFlag() {
+        terminateExtraThreads = false;
+        resetInProgress = false; // Reset flag after reset completes
+        System.out.println("resetTerminationFlag: Threads termination flag reset.");
+    }
+
+    public boolean isResetInProgress() {
+        return resetInProgress;
+    }
+
+
+
     public void clearinput(){
         userResponse.set(null);
     }
+
+    //grab message from server
     public synchronized String getMessage(String prompt) {
+        if (terminateExtraThreads) {
+            System.out.println("getMessage: New call blocked due to termination flag.");
+            return null; // Immediately exit if termination is flagged
+        }
+
         waitingThreads.incrementAndGet(); // Increment thread count
         try {
             clearinput(); // Ensure any existing input is cleared
@@ -33,7 +60,6 @@ public class Display {
 
             // Block until a response is received or termination is flagged
             while (userResponse.get() == null) {
-                // Exit if termination is flagged
                 if (terminateExtraThreads) {
                     System.out.println("getMessage: Termination flag set. Exiting thread.");
                     return null;
@@ -61,7 +87,7 @@ public class Display {
 
 
 
-    public synchronized void setUserResponse(String response) {
+    public synchronized void setUserResponse(String response) throws InterruptedException {
         if (userResponse.get() != null) {
             System.out.println("setUserResponse: Ignoring redundant response: " + response);
             return; // Ignore if a response is already set
@@ -69,6 +95,7 @@ public class Display {
         userResponse.set(response); // Set the user response
         System.out.println("setUserResponse: Setting user response and notifying waiting threads.");
         notifyAll(); // Resume the thread waiting in getMessage
+        Thread.sleep(10);
     }
 
 
@@ -76,33 +103,11 @@ public class Display {
     public void sendMessage(String message, boolean send) {
         if (send) {
             outputLog.append(message).append("\n"); // Append the message to the log
-            messagingTemplate.convertAndSend("/topic/console", outputLog.toString());
+            messagingTemplate.convertAndSend("/topic/console", outputLog.toString().stripLeading());
             clear();
         } else {
             outputLog.append(message).append("\n"); // Accumulate messages in the log
         }
-    }
-
-    public synchronized void terminateExtraThreads() {
-        System.out.println("terminateExtraThreads: Terminating all extra threads.");
-        terminateExtraThreads = true;
-        while (waitingThreads.get() > 0) {
-            notifyAll(); // Notify all waiting threads
-            try {
-                wait(50); // Give threads time to wake up and exit
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.err.println("terminateExtraThreads: Interrupted while waiting for threads to exit.");
-                break;
-            }
-        }
-    }
-
-
-    // Resets the termination flag
-    public void resetTerminationFlag() {
-        terminateExtraThreads = false;
-        System.out.println("resetTerminationFlag: Threads termination flag reset.");
     }
 
     // Clears the console log
@@ -114,6 +119,9 @@ public class Display {
     public void clearScreen(boolean wait) {
         if (wait) {
             getMessage("Press Enter to continue");
+            if (resetInProgress){
+                return;
+            }
         }
         clear();
         sendMessage("clear-console", true);
@@ -137,13 +145,18 @@ public class Display {
             sendMessage((i + 1) + ": " + hand.get(i).GetCardName(),false);
         }
         sendMessage("",true);
-        Thread.sleep(150);
+        Thread.sleep(10);
     }
 
     // Displays the current player's turn
-    public void displayTurn(Player player) {
+    public void displayTurn(Player player) throws InterruptedException {
+        if (isResetInProgress()){
+            return;
+        }
         clearScreen(false);
+        Thread.sleep(10);
         sendMessage("Current Player: " + player.getName(),true);
+        Thread.sleep(10);
     }
 
     public String getOutputLog() {

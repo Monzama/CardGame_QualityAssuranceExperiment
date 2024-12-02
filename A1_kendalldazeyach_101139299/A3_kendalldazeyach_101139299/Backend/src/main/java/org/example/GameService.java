@@ -7,17 +7,16 @@ import java.util.ArrayList;
 public class GameService {
 
     private Display display;
-    private Main game;
+    Main game;
     @Autowired
     public GameService(Display display) {
         this.display = display;
         this.game = new Main(false, display);
         System.out.println("GameService initialized");
     }
-
     // Start the game
-    public String startGame() throws InterruptedException {
-        game.begin(game);
+    public String startGame(boolean test) throws InterruptedException {
+        game.begin(game,test);
         System.out.println(display.getOutputLog());
         String t = display.getOutputLog();
         //display.clear();
@@ -32,6 +31,7 @@ public class GameService {
     }
 
     public void reset() throws InterruptedException {
+        System.out.println("Reset started");
         display.terminateExtraThreads(); // Set termination flag and wake up threads
         Thread.sleep(100); // Allow threads time to exit
         synchronized (display) {
@@ -41,19 +41,24 @@ public class GameService {
             }
         }
         display.clearinput();
-        this.game = new Main(false, display);
-        game.lockedInput = false;
-        game.gameState = -2;
+        game.reset();
         System.out.println("GameService initialized");
-        display.resetTerminationFlag(); // Reset termination flag
+        display.resetTerminationFlag();
+        Thread.sleep(100);
+        this.display.sendMessage("Type start to start game", true);// Reset termination flag after all threads are confirmed exited
     }
 
 
+
     public void cont() throws InterruptedException {
+        if (game.gameState == -3){
+            game.reset();
+            game.gameState = -2;
+            return;
+        }
         //do stuff based on game state
         switch(game.gameState){
             case -1://next turn
-                Thread.sleep(100);
                 System.out.println("Next Turn");
                 game.nextTurn();
                 break;
@@ -99,6 +104,9 @@ public class GameService {
                 System.out.println("Attack results");
                 game.eligble = game.attackResult(game.playAttack(game.current_q.currentStage),game.eligble);
                 System.out.println("Next Stage");
+                if (game.current_q == null){
+                    return;
+                }
                 if (game.current_q.currentStage.id == game.current_q.stages.size()-1 || game.eligble == null){
                     //go to end quest
                     game.gameState = 5;
