@@ -18,7 +18,6 @@ function connect() {
         console.log('Connected: ' + frame);
         isConnected = true;
 
-        // Subscribe to console topic
         stompClient.subscribe('/topic/console', function (message) {
             console.log("Message from server: " + message.body);
 
@@ -35,6 +34,9 @@ function connect() {
                 outputLine.className = "console-line";
                 outputLine.textContent = message.body;
                 consoleDiv.appendChild(outputLine);
+
+                // Scroll the console to the bottom
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
             }
         });
 
@@ -44,6 +46,8 @@ function connect() {
         console.error('Connection error:', error);
     });
 }
+
+
 
 function updatePlayerStatus(playerName, status) {
     let playerDiv = document.getElementById(`status-${playerName}`);
@@ -80,7 +84,12 @@ inputBar.addEventListener("keydown", function (event) {
         outputLine.className = "console-line";
         outputLine.textContent = inputBar.value;
         consoleDiv.appendChild(outputLine);
+
+        // Scroll the console to the bottom
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+
         const command = inputBar.value.trim();
+        // ... rest of the logic remains the same ...
             if (command === "start"){
                 inputBar.value = ""; // Clear the input field
                 sendCommand(command);

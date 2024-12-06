@@ -309,7 +309,7 @@ public class Main {
                 return;
             }
 
-            display.sendMessage(sponsor.name + "Setup Stage " + (i + 1), false);
+            display.sendMessage(sponsor.name + " Setup Stage " + (i + 1), false);
             if (this.QuestBoard.size() > 0){
                 display.sendMessage("Cannot use " + this.QuestBoard.toString(), false);
             }
